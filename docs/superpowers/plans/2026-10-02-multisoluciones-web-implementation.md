@@ -1,7 +1,8 @@
 # Plan de implementación: Multisoluciones Web
 
-**Base:** `docs/superpowers/specs/2026-10-02-multisoluciones-web-design.md` (aprobado por el usuario)  
-**Modo:** local; sin acceso ni despliegue a VPS; sin GitHub.  
+**Base:** `docs/superpowers/specs/2026-10-02-multisoluciones-web-design.md` (aprobado por el usuario)
+
+**Modo:** local; sin acceso ni despliegue a VPS; sin GitHub.
 **Estado:** en ejecución.
 
 ## Salvaguardas iniciales
