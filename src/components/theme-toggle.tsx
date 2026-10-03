@@ -40,7 +40,7 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={t('themeToggle')}
       title={t('themeToggle')}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:text-blue-300"
+      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground transition hover:border-brand hover:text-brand-strong"
     >
       <svg
         aria-hidden="true"

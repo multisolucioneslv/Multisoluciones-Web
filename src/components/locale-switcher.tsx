@@ -63,7 +63,7 @@ export function LocaleSwitcher() {
         title={t('localeSwitcher')}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:text-blue-300"
+        className="inline-flex h-10 items-center gap-2 rounded-full border border-border bg-background px-3 text-sm font-semibold text-foreground transition hover:border-brand hover:text-brand-strong"
       >
         <FlagIcon locale={locale} className="h-4 w-6" />
         <span>{locale.toUpperCase()}</span>
@@ -73,7 +73,7 @@ export function LocaleSwitcher() {
         <ul
           role="menu"
           aria-label={t('localeSwitcher')}
-          className="absolute right-0 z-50 mt-2 w-40 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800"
+          className="absolute right-0 z-50 mt-2 w-40 overflow-hidden rounded-2xl border border-border bg-background py-1 shadow-xl"
         >
           {routing.locales.map((option) => {
             const isActive = option === locale;
@@ -85,8 +85,8 @@ export function LocaleSwitcher() {
                   onClick={() => selectLocale(option)}
                   aria-current={isActive ? 'true' : undefined}
                   className={isActive
-                    ? 'flex w-full items-center gap-3 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-200'
-                    : 'flex w-full items-center gap-3 px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700'}
+                    ? 'flex w-full items-center gap-3 bg-surface px-4 py-2 text-sm font-semibold text-brand-strong'
+                    : 'flex w-full items-center gap-3 px-4 py-2 text-sm text-muted transition hover:bg-surface'}
                 >
                   <FlagIcon locale={option} />
                   <span>{localeNames[option]}</span>

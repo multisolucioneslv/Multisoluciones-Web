@@ -8,7 +8,6 @@ import { LocaleSwitcher } from '@/components/locale-switcher';
 
 const navigationItems = [
   { href: '/', key: 'home' },
-  { href: '/blog', key: 'blog' },
   { href: '/services', key: 'services' },
   { href: '/resources', key: 'resources' },
   { href: '/projects', key: 'projects' }
@@ -28,16 +27,16 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 shadow-sm backdrop-blur transition-colors dark:border-slate-700 dark:bg-slate-900/90">
-      <nav className="mx-auto flex min-h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-xl transition-colors">
+      <nav className="mx-auto flex min-h-[4.5rem] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+        <div className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
           <Link href="/" onClick={closeMenu}>
-            Jscothserver
+            <span>Multisoluciones</span><span className="ml-1 text-brand">Web</span>
           </Link>
         </div>
 
         <div className="hidden items-center gap-6 md:flex">
-          <ul className="flex space-x-6 text-sm font-medium text-slate-700 dark:text-slate-300">
+          <ul className="flex space-x-2 text-sm font-medium text-muted">
             {navigationItems.map((item) => (
               <li key={item.href}>
                 <Link
@@ -45,8 +44,8 @@ export function SiteHeader() {
                   aria-current={isActiveRoute(item.href) ? 'page' : undefined}
                   className={
                     isActiveRoute(item.href)
-                      ? 'rounded-full bg-blue-50 px-3 py-2 text-blue-700 ring-1 ring-blue-100 dark:bg-blue-950/70 dark:text-blue-200 dark:ring-blue-800'
-                      : 'rounded-full px-3 py-2 hover:text-blue-600 dark:hover:text-blue-300'
+                      ? 'rounded-full bg-surface px-3 py-2 text-brand-strong ring-1 ring-border'
+                      : 'rounded-full px-3 py-2 transition-colors hover:text-brand-strong'
                   }
                 >
                   {t(item.key)}
@@ -68,7 +67,7 @@ export function SiteHeader() {
             aria-expanded={isMenuOpen}
             aria-controls="mobile-navigation"
             aria-label={t('menuToggle')}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:text-blue-300"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground transition hover:border-brand hover:text-brand-strong"
           >
             <svg
               aria-hidden="true"
@@ -91,9 +90,9 @@ export function SiteHeader() {
       {isMenuOpen ? (
         <div
           id="mobile-navigation"
-          className="border-t border-slate-200 bg-white px-4 py-4 shadow-lg dark:border-slate-700 dark:bg-slate-900 md:hidden"
+          className="border-t border-border bg-background px-5 py-4 md:hidden"
         >
-          <ul className="mx-auto flex max-w-7xl flex-col gap-2 text-base font-medium text-slate-700 dark:text-slate-200">
+          <ul className="mx-auto flex max-w-7xl flex-col gap-2 text-base font-medium text-muted">
             {navigationItems.map((item) => (
               <li key={item.href}>
                 <Link
@@ -102,8 +101,8 @@ export function SiteHeader() {
                   onClick={closeMenu}
                   className={
                     isActiveRoute(item.href)
-                      ? 'block rounded-2xl bg-blue-50 px-4 py-3 font-semibold text-blue-700 ring-1 ring-blue-100 dark:bg-blue-950/70 dark:text-blue-200 dark:ring-blue-800'
-                      : 'block rounded-2xl px-4 py-3 transition hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-slate-800 dark:hover:text-blue-300'
+                      ? 'block rounded-2xl bg-surface px-4 py-3 font-semibold text-brand-strong ring-1 ring-border'
+                      : 'block rounded-2xl px-4 py-3 transition hover:bg-surface hover:text-brand-strong'
                   }
                 >
                   {t(item.key)}
