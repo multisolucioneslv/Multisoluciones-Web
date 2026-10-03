@@ -1,0 +1,160 @@
+{
+  "Navigation": {
+    "home": "Início",
+    "blog": "Blog",
+    "services": "Serviços",
+    "resources": "Recursos",
+    "projects": "Projetos",
+    "themeToggle": "Alternar tema",
+    "menuToggle": "Abrir ou fechar o menu de navegação",
+    "localeSwitcher": "Mudar idioma"
+  },
+  "Common": {
+    "download": "Baixar",
+    "details": "Ver detalhes →"
+  },
+  "Index": {
+    "title": "Bem-vindo ao Jscothserver",
+    "hero_title": "Impulsione seu negócio com tecnologia sob medida",
+    "hero_subtitle": "Da sua presença online a sistemas de gestão completos. Resolvemos problemas de negócios com software desenvolvido especialmente para você.",
+    "hero_cta": "Solicitar Consultoria",
+    "projects_title": "Trabalhos que falam por si",
+    "projects_subtitle": "Sistemas funcionais em produção, criados para otimizar negócios reais.",
+    "services_title": "Nossas Soluções",
+    "services_web": "Criação de Sites",
+    "services_web_desc": "Presença digital profissional e atraente para que seus clientes encontrem você com facilidade.",
+    "services_dev": "Desenvolvimento de Software Sob Medida",
+    "services_dev_desc": "Sistemas de gestão, controle de estoque e automação total para a sua empresa.",
+    "services_app": "Aplicativos Móveis",
+    "services_app_desc": "Leve o seu negócio para o bolso dos seus clientes com aplicativos rápidos e modernos.",
+    "services_special": "Serviços Especializados",
+    "services_special_desc": "Consultoria em tecnologia e serviços que envolvem trabalho presencial (ex.: programação de controles remotos).",
+    "project_appfood_image": "Imagem do AppFood",
+    "project_appfood_name": "AppFood",
+    "project_appfood_desc": "Sistema de quiosque e pedidos para restaurantes com pagamento integrado.",
+    "project_courses_image": "Imagem da Plataforma de Cursos",
+    "project_courses_name": "Plataforma de Cursos",
+    "project_courses_desc": "Sistema completo de e-learning com módulos, aulas e acompanhamento do progresso.",
+    "project_torestaurantes_image": "Imagem do toRestaurantes",
+    "project_torestaurantes_name": "toRestaurantes",
+    "project_torestaurantes_desc": "Plataforma SaaS multi-inquilino para gestão de unidades de restaurantes.",
+    "contact_title": "Vamos falar sobre seu próximo projeto",
+    "contact_name": "Seu nome",
+    "contact_email": "Seu endereço de e-mail",
+    "contact_service": "Como podemos ajudar?",
+    "contact_message": "Conte um pouco sobre sua ideia ou necessidade...",
+    "contact_submit": "Enviar Mensagem"
+  },
+  "Resources": {
+    "eyebrow": "Catálogo de recursos",
+    "title": "Recursos gratuitos para sua comunidade",
+    "intro": "Escolha uma categoria para acessar downloads, guias e materiais. Cada recurso mantém sua própria página para que tudo continue organizado à medida que o catálogo cresce.",
+    "available": "Disponível agora",
+    "comingSoon": "Em breve",
+    "openResource": "Abrir recurso",
+    "queleaTitle": "Quelea",
+    "queleaText": "Software gratuito de projeção para igrejas, com downloads oficiais, Bíblias, canções e guias de configuração.",
+    "driversTitle": "Drivers para PC",
+    "driversText": "Drivers e guias de instalação para equipamentos e periféricos. Esta categoria está sendo preparada.",
+    "moreTitle": "Mais recursos a caminho",
+    "moreText": "Quando uma nova categoria for adicionada, ela aparecerá aqui sem se confundir com o material do Quelea nem com os demais recursos."
+  },
+  "ResourcesDrivers": {
+    "eyebrow": "Recurso em preparação",
+    "title": "Drivers para PC",
+    "text": "Esta categoria vai reunir drivers e guias de instalação para equipamentos e periféricos. Ainda não há downloads publicados.",
+    "back": "Voltar ao catálogo de recursos"
+  },
+  "ResourcesQuelea": {
+    "eyebrow": "Recursos gratuitos para igrejas",
+    "title": "Quelea para projeção, Bíblias, hinários e muito mais",
+    "intro": "Quelea é um software gratuito e de código aberto para projeção em igrejas. Esta página reúne links oficiais e recursos compatíveis para que as igrejas possam começar sem comprometer o orçamento.",
+    "officialBadge": "Informações coletadas no site oficial do Quelea",
+    "downloadTitle": "Baixar o Quelea",
+    "downloadText": "O download principal deve ser feito a partir do projeto oficial. De acordo com a documentação, o Quelea funciona em Windows, macOS e Linux; o Windows é a plataforma mais estável para a maioria dos usuários.",
+    "windows": "Windows x64",
+    "mac": "Mac",
+    "linux": "Linux / Snap",
+    "crossPlatform": "Multiplataforma",
+    "officialSite": "Site oficial",
+    "manuals": "Manuais oficiais",
+    "manualText": "O Quelea oferece manuais oficiais em espanhol e em inglês.",
+    "biblesTitle": "Bíblias prontas para importar",
+    "biblesText": "O Quelea permite adicionar Bíblias em formato XML ou XMM a partir da aba Bible. Cada edição é baixada diretamente de sua fonte original; revise a licença de cada uma antes de usá-la em sua igreja.",
+    "officialCatalogue": "Catálogo oficial",
+    "songsTitle": "Hinários e bancos de canções",
+    "songsText": "Estes bancos foram reunidos e mantidos por irmãos de diferentes igrejas para que cada congregação possa começar sem digitar canções uma por uma. Importe-os em Database > Import > Pacote de canções do Quelea (QSP).",
+    "fullCollectionTitle": "Coleção completa",
+    "fullCollectionText": "Se a sua igreja trabalha em mais de um idioma, esta opção reúne tudo em um único arquivo. O tamanho é grande, portanto baixe-o apenas uma vez.",
+    "fullCollectionName": "Coleção completa de canções",
+    "importGuide": "Ver guia de importação",
+    "stepsTitle": "Passos sugeridos para instalar e importar recursos",
+    "steps": [
+      "Baixe e instale o Quelea a partir do link oficial correspondente ao seu sistema operacional.",
+      "Abra o Quelea e revise a configuração de tela/projetor antes de usar em um culto real.",
+      "Para adicionar Bíblias: abra Options/Settings, entre na aba Bible, pressione Add bible e selecione o arquivo XML baixado.",
+      "Para usar uma passagem bíblica: abra a aba Bible, escolha a versão, o livro, o capítulo e os versículos e pressione Add to Schedule.",
+      "Para importar canções: vá em Database > Import, escolha o tipo de arquivo compatível, selecione o recurso baixado e verifique duplicatas antes de importar.",
+      "Faça um teste completo: adicione canções, passagens bíblicas, imagens ou vídeos ao Order of Service e envie cada item para o Live."
+    ],
+    "helpTitle": "Orientação gratuita para igrejas",
+    "helpText": "Se a sua igreja quiser implementar o Quelea, terei prazer em orientá-la passo a passo. Essa ajuda não tem custo. Se quiser apoiar o tempo investido, pode fazer uma doação voluntária, mas ela não é obrigatória.",
+    "sourceTitle": "Fontes oficiais consultadas",
+    "note": "Nota: o Quelea e seus recursos oficiais pertencem aos seus respectivos autores. Esta página organiza links de referência; cada igreja deve revisar a licença de cada recurso antes de baixá-lo ou usá-lo.",
+    "languages": {
+      "es": "Espanhol",
+      "en": "Inglês",
+      "ko": "Coreano",
+      "pt": "Português"
+    },
+    "bibleFormats": {
+      "zefania": "Zefania XML · ZIP",
+      "package": "XMM / XML · do pacote de 7 Bíblias",
+      "packageSeven": "ZIP · RV60, Contemporânea, Dios Habla Hoy, NTV, NVI, LASER e TLA"
+    },
+    "bibleNames": {
+      "sevenPack": "Pacote com 7 Bíblias"
+    },
+    "catalogueCount": "{count, plural, one {# edição oficial disponível} other {# edições oficiais disponíveis}}",
+    "songFormat": "Quelea QSP",
+    "archiveFormat": "ZIP",
+    "songsCount": "{count, plural, =0 {sem canções} one {# canção} other {# canções}}",
+    "fullCollectionSongs": "{count, plural, one {# canção} other {# canções}} em mais de 40 idiomas",
+    "songNames": {
+      "es": "Banco de canções em espanhol",
+      "en": "Banco de canções em inglês",
+      "ko": "Coleção de canções em coreano",
+      "pt": "Banco de canções em português",
+      "ptBr": "Hinários e manuais para o Quelea (Brasil)"
+    },
+    "ptBrContents": "{hymnals, plural, one {# hinário} other {# hinários}} + {bibles, plural, one {# Bíblia} other {# Bíblias}}",
+    "sources": {
+      "resources": "Recursos do Quelea",
+      "docs": "Documentação do Quelea",
+      "bibleTab": "Aba Bible",
+      "importSongs": "Importar canções",
+      "orderOfService": "Order of Service",
+      "zefania": "Bíblias Zefania",
+      "worshipLeader": "Bancos de canções do Worship Leader",
+      "spanishBibles": "Bíblias em espanhol",
+      "portugueseMaterials": "Materiais em português",
+      "forum": "Fórum"
+    }
+  },
+  "Services": {
+    "title": "Serviços Adicionais",
+    "text": "Empreendimentos separados. Exemplo: cópia de controle remoto para veículos (com certas restrições)."
+  },
+  "Blog": {
+    "title": "Blog",
+    "text": "Artigos importantes e dicas para os visitantes."
+  },
+  "Home": {
+    "title": "Página Inicial",
+    "text": "Tudo o que há de principal e informativo no site da jscothserver."
+  },
+  "Projects": {
+    "title": "Projetos e Demos",
+    "text": "Lista de projetos finalizados onde os clientes podem solicitar uma demo."
+  }
+}

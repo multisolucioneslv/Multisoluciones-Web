@@ -1,0 +1,160 @@
+{
+  "Navigation": {
+    "home": "Home",
+    "blog": "Blog",
+    "services": "Services",
+    "resources": "Resources",
+    "projects": "Projects",
+    "themeToggle": "Toggle theme",
+    "menuToggle": "Open or close navigation menu",
+    "localeSwitcher": "Change language"
+  },
+  "Common": {
+    "download": "Download",
+    "details": "View details →"
+  },
+  "Index": {
+    "title": "Welcome to Jscothserver",
+    "hero_title": "Power your business with custom technology",
+    "hero_subtitle": "From your online presence to complete management systems. We solve business problems with software designed specifically for you.",
+    "hero_cta": "Request Consultation",
+    "projects_title": "Work that speaks for itself",
+    "projects_subtitle": "Functional systems in production, built to optimize real businesses.",
+    "services_title": "Our Solutions",
+    "services_web": "Website Creation",
+    "services_web_desc": "Professional and attractive digital presence so your customers can find you easily.",
+    "services_dev": "Custom Software Development",
+    "services_dev_desc": "Management systems, inventory control, and total automation for your company.",
+    "services_app": "Mobile Applications",
+    "services_app_desc": "Bring your business to your customers' pockets with fast and modern apps.",
+    "services_special": "Specialized Services",
+    "services_special_desc": "Tech consulting and physical services (e.g., remote key fob programming).",
+    "project_appfood_image": "AppFood image",
+    "project_appfood_name": "AppFood",
+    "project_appfood_desc": "Kiosk and ordering system for restaurants with integrated payment.",
+    "project_courses_image": "Course Platform image",
+    "project_courses_name": "Course Platform",
+    "project_courses_desc": "Complete e-learning system with modules, lessons and progress tracking.",
+    "project_torestaurantes_image": "toRestaurantes image",
+    "project_torestaurantes_name": "toRestaurantes",
+    "project_torestaurantes_desc": "Multi-tenant SaaS platform for managing food locations.",
+    "contact_title": "Let's talk about your next project",
+    "contact_name": "Your name",
+    "contact_email": "Your email address",
+    "contact_service": "How can we help you?",
+    "contact_message": "Tell us a bit about your idea or need...",
+    "contact_submit": "Send Message"
+  },
+  "Resources": {
+    "eyebrow": "Resource catalog",
+    "title": "Free resources for your community",
+    "intro": "Choose a category to access downloads, guides and materials. Each resource keeps its own page so everything stays organized as the catalog grows.",
+    "available": "Available now",
+    "comingSoon": "Coming soon",
+    "openResource": "Open resource",
+    "queleaTitle": "Quelea",
+    "queleaText": "Free church projection software, with official downloads, Bibles, songs and setup guides.",
+    "driversTitle": "PC Drivers",
+    "driversText": "Drivers and installation guides for equipment and peripherals. This category is being prepared.",
+    "moreTitle": "More resources on the way",
+    "moreText": "When a new category is added, it will appear here without being mixed with Quelea or other resources."
+  },
+  "ResourcesDrivers": {
+    "eyebrow": "Resource in preparation",
+    "title": "PC Drivers",
+    "text": "This category will gather drivers and installation guides for equipment and peripherals. There are no published downloads yet.",
+    "back": "Back to resource catalog"
+  },
+  "ResourcesQuelea": {
+    "eyebrow": "Free resources for churches",
+    "title": "Quelea projection, Bibles, hymnals and much more",
+    "intro": "Quelea is free and open-source church projection software. This page gathers official links and compatible resources so churches can get started without affecting their budget.",
+    "officialBadge": "Information gathered from the official Quelea website",
+    "downloadTitle": "Download Quelea",
+    "downloadText": "The main download should come from the official project. According to the docs, Quelea runs on Windows, macOS and Linux; Windows is the most stable platform for most users.",
+    "windows": "Windows x64",
+    "mac": "Mac",
+    "linux": "Linux / Snap",
+    "crossPlatform": "Cross platform",
+    "officialSite": "Official site",
+    "manuals": "Official manuals",
+    "manualText": "Quelea provides official manuals, including Spanish and English versions.",
+    "biblesTitle": "Bible files ready to import",
+    "biblesText": "Quelea can add Bibles in XML or XMM format from the Bible tab. Each edition downloads directly from its original source; review every license before using it in your church.",
+    "officialCatalogue": "Official catalog",
+    "songsTitle": "Hymnals and song databases",
+    "songsText": "These databases were put together and maintained by brothers from different churches so each congregation can get started without typing songs one by one. Import them from Database > Import > Quelea song package (QSP).",
+    "fullCollectionTitle": "Full collection",
+    "fullCollectionText": "If your church works in more than one language, this option puts everything in a single file. It is large, so download it only once.",
+    "fullCollectionName": "Complete song collection",
+    "importGuide": "View import guide",
+    "stepsTitle": "Suggested setup and import steps",
+    "steps": [
+      "Download and install Quelea from the official link for your operating system.",
+      "Open Quelea and review the display/projector setup before using it in a real service.",
+      "To add Bibles: open Options/Settings, go to the Bible tab, click Add bible and select the downloaded XML file.",
+      "To use a Bible passage: open the Bible tab, choose version, book, chapter and verses, then click Add to Schedule.",
+      "To import songs: go to Database > Import, choose the compatible file type, select the downloaded resource and check duplicates before importing.",
+      "Run a complete test: add songs, Bible passages, images or videos to the Order of Service and send each item to Live."
+    ],
+    "helpTitle": "Free guidance for churches",
+    "helpText": "If a church wants to implement Quelea, I will gladly guide them step by step. There is no charge for this help. If they want to support the time invested, they may give a voluntary donation, but it is not required.",
+    "sourceTitle": "Official sources consulted",
+    "note": "Note: Quelea and its official resources belong to their respective authors. This page organizes reference links; each church must review every resource license before downloading or using it.",
+    "languages": {
+      "es": "Spanish",
+      "en": "English",
+      "ko": "Korean",
+      "pt": "Portuguese"
+    },
+    "bibleFormats": {
+      "zefania": "Zefania XML · ZIP",
+      "package": "XMM / XML · from the 7-Bible package",
+      "packageSeven": "ZIP · RV60, Contemporary, Dios Habla Hoy, NTV, NVI, LASER and TLA"
+    },
+    "bibleNames": {
+      "sevenPack": "Seven-Bible package"
+    },
+    "catalogueCount": "{count, plural, one {# official edition} other {# official editions}} available",
+    "songFormat": "Quelea QSP",
+    "archiveFormat": "ZIP",
+    "songsCount": "{count, plural, =0 {no songs} one {# song} other {# songs}}",
+    "fullCollectionSongs": "{count, plural, one {# song} other {# songs}} in 40+ languages",
+    "songNames": {
+      "es": "Spanish song database",
+      "en": "English worship song base",
+      "ko": "Korean song collection",
+      "pt": "Portuguese song database",
+      "ptBr": "Hymnals and manuals for Quelea (Brazil)"
+    },
+    "ptBrContents": "{hymnals, plural, one {# hymnal} other {# hymnals}} + {bibles, plural, one {# Bible} other {# Bibles}}",
+    "sources": {
+      "resources": "Quelea resources",
+      "docs": "Quelea docs",
+      "bibleTab": "Bible tab",
+      "importSongs": "Import songs",
+      "orderOfService": "Order of Service",
+      "zefania": "Zefania Bibles",
+      "worshipLeader": "Worship Leader song databases",
+      "spanishBibles": "Bibles in Spanish",
+      "portugueseMaterials": "Materials in Portuguese",
+      "forum": "Forum"
+    }
+  },
+  "Services": {
+    "title": "Additional Services",
+    "text": "Separate ventures. Example: duplicate remote key fob for vehicles (with certain restrictions)."
+  },
+  "Blog": {
+    "title": "Blog",
+    "text": "Important articles and tips for visitors."
+  },
+  "Home": {
+    "title": "Home Page",
+    "text": "Everything main and informative on the jscothserver website."
+  },
+  "Projects": {
+    "title": "Projects and Demos",
+    "text": "List of finished projects where clients can request a demo."
+  }
+}
