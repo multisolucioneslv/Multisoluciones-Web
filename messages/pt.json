@@ -220,7 +220,11 @@
     "contactEyebrow": "Vamos conversar",
     "contactTitle": "Conte o que você quer tornar mais simples.",
     "contactText": "Escolha a forma de contato mais conveniente. Vamos começar entendendo sua necessidade.",
-    "whatsappAction": "Enviar mensagem no WhatsApp"
+    "whatsappAction": "Enviar mensagem no WhatsApp",
+    "industryEyebrow": "Veja o que é possível",
+    "industryTitle": "Um site pode parecer feito para o seu tipo de trabalho.",
+    "industryIntro": "Algumas direções visuais para negócios de serviços. Cada conceito parte das decisões que seus clientes precisam tomar, não de um modelo fixo.",
+    "industryNote": "São apenas conceitos ilustrativos. Seu site é criado para o seu negócio."
   },
   "ContactForm": {
     "name": "Seu nome",

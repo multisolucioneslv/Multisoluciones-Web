@@ -220,7 +220,11 @@
     "contactEyebrow": "Start a conversation",
     "contactTitle": "Tell us what you want to make easier.",
     "contactText": "Choose the way that works best for you. We will start by understanding your needs.",
-    "whatsappAction": "Message on WhatsApp"
+    "whatsappAction": "Message on WhatsApp",
+    "industryEyebrow": "See what is possible",
+    "industryTitle": "A website can feel made for your kind of work.",
+    "industryIntro": "A few visual directions for service businesses. Each concept starts from the decisions customers need to make, not a fixed template.",
+    "industryNote": "Illustrative concepts only. Your website is designed around your business."
   },
   "ContactForm": {
     "name": "Your name",

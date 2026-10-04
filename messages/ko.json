@@ -220,7 +220,11 @@
     "contactEyebrow": "대화를 시작해 보세요",
     "contactTitle": "무엇을 더 쉽게 만들고 싶은지 알려 주세요.",
     "contactText": "편한 연락 방법을 선택해 주세요. 필요한 점을 먼저 이해하겠습니다.",
-    "whatsappAction": "WhatsApp 메시지 보내기"
+    "whatsappAction": "WhatsApp 메시지 보내기",
+    "industryEyebrow": "가능성을 살펴보세요",
+    "industryTitle": "웹사이트는 여러분의 업무에 맞춰 만들어질 수 있습니다.",
+    "industryIntro": "서비스 비즈니스를 위한 몇 가지 시각적 방향입니다. 각 콘셉트는 고정된 템플릿이 아닌 고객이 내려야 할 결정에서 시작합니다.",
+    "industryNote": "예시용 콘셉트입니다. 웹사이트는 여러분의 비즈니스에 맞춰 설계됩니다."
   },
   "ContactForm": {
     "name": "이름",

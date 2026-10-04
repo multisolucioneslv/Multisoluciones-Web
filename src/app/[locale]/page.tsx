@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { ContactForm } from '@/components/contact-form';
+import { IndustryShowcase } from '@/components/industry-showcase';
 
 export default async function IndexPage() {
   const t = await getTranslations('HomePage');
@@ -54,6 +55,8 @@ export default async function IndexPage() {
           {t('serviceMore')} <span aria-hidden="true">↗</span>
         </Link>
       </section>
+
+      <IndustryShowcase />
 
       <section className="grid gap-10 rounded-[2rem] border border-border bg-surface px-7 py-10 sm:px-11 sm:py-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 lg:px-14">
         <div>
