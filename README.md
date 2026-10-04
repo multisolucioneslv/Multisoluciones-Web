@@ -1,4 +1,17 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Multisoluciones Web
+
+Repositorio privado de la cuenta GitHub **multisolucioneslv (Juan Torres)**:
+[Multisoluciones-Web](https://github.com/multisolucioneslv/Multisoluciones-Web).
+
+El código y su historial local están respaldados en GitHub desde el 2026-10-04.
+Consulta [acceso SSH, inventario del respaldo y recuperación](docs/github-respaldo.md)
+y [estado del flujo de contacto](docs/contacto/README.md).
+
+Las claves privadas, variables de entorno, datos de PostgreSQL y configuración viva
+de n8n no se incluyen en el repositorio.
+
+El proyecto utiliza Next.js. Las instrucciones genéricas originales siguientes
+se conservan como referencia; no describen el despliegue actual en Hostinger.
 
 ## Getting Started
 

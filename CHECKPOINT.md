@@ -1,5 +1,18 @@
 # Checkpoint - Proyecto: jscothserver
 
+## Actualización de respaldo — 2026-10-04
+
+Proyecto local respaldado en el repositorio privado
+`multisolucioneslv/Multisoluciones-Web`, rama `main`, remoto SSH `origin`.
+El primer push incluyó nueve commits hasta `8f39ee5`; los nuevos cambios de
+documentación se guardan en commits posteriores. Cuenta: Juan Torres
+(`multisolucioneslv`). Detalles de claves, configuración, inventario y recuperación:
+[GitHub y respaldo](docs/github-respaldo.md). No guardar secretos en este checkpoint.
+
+Para el estado reciente del contacto consultar [su documentación](docs/contacto/README.md)
+y el [diseño aprobado del 2026-10-04](docs/superpowers/specs/2026-10-04-contacto-correo-telegram-design.md).
+Las notas siguientes son históricas y pueden describir estados anteriores al despliegue.
+
 **Fecha de inicio:** 2026-09-30
 **Tecnología principal:** Next.js (App Router), TypeScript, Tailwind CSS
 
