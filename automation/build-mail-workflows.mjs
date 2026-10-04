@@ -1,0 +1,70 @@
+// Builds importable n8n artifacts from credential references, never decrypted secrets.
+import { readFileSync, writeFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
+const [auditDirectory, outputDirectory = auditDirectory] = process.argv.slice(2);
+if (!auditDirectory) throw new Error('Usage: node automation/build-mail-workflows.mjs AUDIT_DIRECTORY [OUTPUT_DIRECTORY]');
+const load = (file) => JSON.parse(readFileSync(`${auditDirectory}/${file}`, 'utf8'))[0];
+const current = load('contact.json');
+const old = load('old-imap.json');
+const postgres = current.nodes.find(n => n.type.endsWith('.postgres')).credentials;
+const smtp = current.nodes.find(n => n.type.endsWith('.emailSend')).credentials;
+const imap = old.nodes.find(n => n.type.endsWith('.emailReadImap')).credentials;
+const source = readFileSync(new URL('./inbound-email.mjs', import.meta.url), 'utf8').replace(/^export /gm, '');
+const renderer = readFileSync(new URL('./contact-email.mjs', import.meta.url), 'utf8').replace(/^export /gm, '');
+const sql = file => readFileSync(new URL(`../database/queries/${file}.sql`, import.meta.url), 'utf8');
+const node = (name, type, parameters, position, credentials, typeVersion=1) => ({id:randomUUID(),name,type:`n8n-nodes-base.${type}`,typeVersion,position,parameters,...(credentials?{credentials}:{})});
+const code = (name,jsCode,position) => node(name,'code',{mode:'runOnceForAllItems',jsCode},position,null,2);
+const db = (name,query,queryReplacement,position) => node(name,'postgres',{operation:'executeQuery',query,options:{queryReplacement}},position,postgres,2.6);
+const connect = (connections,from,to,output=0) => {
+  const entries = connections[from] ||= {main:[]};
+  entries.main[output] ||= [];
+  entries.main[output].push({node:to,type:'main',index:0});
+};
+const startDate = process.env.MW_EMAIL_START_AT || new Date().toISOString();
+if (Number.isNaN(Date.parse(startDate))) throw new Error('Invalid MW_EMAIL_START_AT');
+const receiverNodes = [
+  node('Recibir correos directos - info Multisoluciones Web','emailReadImap',{mailbox:'INBOX',postProcessAction:'nothing',format:'simple',downloadAttachments:false,options:{customEmailConfig:'["ALL"]',trackLastMessageId:true,forceReconnect:30}},[0,0],imap,2.1),
+  code('Normalizar correo y excluir automáticos',source+`\nconst cutoff = ${JSON.stringify(startDate)};\nreturn $input.all().flatMap((item,index) => { const email=normalizeImapEmail(item.json); if (!email.receivedAt || email.receivedAt < cutoff) return []; const preliminary=classifyIncomingEmail({email}); if (preliminary.reason !== 'unknown_contact') return []; return [{json:{email},pairedItem:{item:index}}]; });`,[240,0]),
+  db('Buscar contacto y solicitudes por identificadores de correo',`SELECT row_to_json(c) AS contact, $3::jsonb AS email, COALESCE((SELECT jsonb_agg(q) FROM (SELECT r.id,r.locale,array_agg(m.email_message_id) AS "outboundMessageIds" FROM public.requests r JOIN public.messages m ON m.request_id=r.id AND m.direction='outbound' AND m.email_message_id=ANY($2::text[]) WHERE r.contact_id=c.id GROUP BY r.id,r.locale LIMIT 20) q),'[]'::jsonb) AS requests FROM public.contacts c WHERE c.email_normalized=$1 LIMIT 1;`,"={{ [$json.email.from, $json.email.references, JSON.stringify($json.email)] }}",[480,0]),
+  code('Clasificar respuesta y autorización explícita',source+`\nreturn $input.all().map((item,index) => { const row=item.json; const contact={...row.contact,email:row.contact.email_normalized,name:row.contact.full_name}; const classification=classifyIncomingEmail({email:row.email,contact,knownRequests:row.requests}); classification.contact=contact; return {json:{classification},pairedItem:{item:index}}; });`,[720,0]),
+  db('Guardar historial consentimiento y avisos pendientes',sql('persist_incoming_email'),"={{ [JSON.stringify($json.classification)] }}",[960,0])
+];
+const receiverConnections={};
+receiverNodes.slice(1).forEach((n,i)=>connect(receiverConnections,receiverNodes[i].name,n.name));
+const receiver={id:'MWCorreoDirecto20261004',name:'Multisoluciones Web - Recibir correos directos',active:false,nodes:receiverNodes,connections:receiverConnections,settings:{executionOrder:'v1',executionTimeout:120},pinData:{},staticData:null};
+const adminName='Enviar aviso de correo a administración';
+const replyName='Enviar confirmación al cliente por correo';
+const workerNodes=[
+  node('Revisar avisos pendientes cada minuto','scheduleTrigger',{rule:{interval:[{field:'minutes',minutesInterval:1}]}},[0,0],null,1.2),
+  db('Reservar avisos pendientes sin duplicarlos',`WITH jobs AS (SELECT id FROM public.email_notifications WHERE state='pending' AND kind IN ('admin','reply') ORDER BY id FOR UPDATE SKIP LOCKED LIMIT 20) UPDATE public.email_notifications n SET state='processing',claim_token=$1,claimed_at=now() FROM jobs WHERE n.id=jobs.id RETURNING n.*;`,"={{ [String($execution.id)] }}",[240,0]),
+  code('Preparar correo con idioma y diseño de marca',source+'\n'+renderer+`\nreturn $input.all().map((item,index)=> { const job=item.json; const result=job.payload; const contact=result.contact || {}; const content=job.kind==='admin'?buildAdminNotification(result,contact):buildIncomingReply(result,contact); if (!content) throw new Error('Notification without content'); return {json:{...job,to:job.kind==='admin'?'info@multisoluciones.online':content.to,subject:content.subject,text:content.text,html:renderContactEmail({...content,language:job.kind==='admin'?'es':result.language})},pairedItem:{item:index}}; });`,[480,0]),
+  node('¿El aviso es para administración?','if',{conditions:{options:{caseSensitive:true,leftValue:'',typeValidation:'strict',version:2},conditions:[{id:randomUUID(),leftValue:'={{ $json.kind }}',rightValue:'admin',operator:{type:'string',operation:'equals'}}],combinator:'and'},options:{}},[720,0],null,2.2),
+  node(adminName,'emailSend',{fromEmail:'Multisoluciones Web <info@multisoluciones.online>',toEmail:'={{ $json.to }}',subject:'={{ $json.subject }}',emailFormat:'both',text:'={{ $json.text }}',html:'={{ $json.html }}',options:{appendAttribution:false}},[960,-100],smtp,2.1),
+  node(replyName,'emailSend',{fromEmail:'Multisoluciones Web <info@multisoluciones.online>',toEmail:'={{ $json.to }}',subject:'={{ $json.subject }}',emailFormat:'both',text:'={{ $json.text }}',html:'={{ $json.html }}',options:{appendAttribution:false,replyTo:'info@multisoluciones.online'}},[960,100],smtp,2.1),
+  db('Registrar aviso enviado a administración',sql('complete_email_notification'),"={{ [$('Preparar correo con idioma y diseño de marca').item.json.id, $('Preparar correo con idioma y diseño de marca').item.json.claim_token, $json.error ? 'uncertain' : 'sent', $json.messageId || null, $json.error || null] }}",[1200,-100]),
+  db('Registrar confirmación enviada y su identificador SMTP',`WITH completed AS (${sql('complete_email_notification').replace(/;\s*$/,'')}) INSERT INTO public.messages(contact_id,request_id,direction,channel,body,is_test,email_message_id,email_subject) SELECT c.id,$6::bigint,'outbound','email',$7::text,c.is_test,$4::text,$8::text FROM completed n JOIN public.email_notifications j ON j.id=n.id JOIN public.contacts c ON c.id=j.contact_id WHERE n.state='sent' AND $4::text IS NOT NULL ON CONFLICT (email_message_id) WHERE email_message_id IS NOT NULL DO NOTHING RETURNING id;`,"={{ [$('Preparar correo con idioma y diseño de marca').item.json.id, $('Preparar correo con idioma y diseño de marca').item.json.claim_token, $json.error ? 'uncertain' : 'sent', $json.messageId || null, $json.error || null, $('Preparar correo con idioma y diseño de marca').item.json.request_id, $('Preparar correo con idioma y diseño de marca').item.json.text, $('Preparar correo con idioma y diseño de marca').item.json.subject] }}",[1200,100])
+];
+for (const n of workerNodes.filter(n=>n.type.endsWith('.emailSend'))) n.onError='continueRegularOutput';
+const workerConnections={};
+workerNodes.slice(1,4).forEach((n,i)=>connect(workerConnections,workerNodes[i].name,n.name));
+connect(workerConnections,workerNodes[3].name,adminName,0);connect(workerConnections,workerNodes[3].name,replyName,1);
+connect(workerConnections,adminName,workerNodes[6].name);connect(workerConnections,replyName,workerNodes[7].name);
+const worker={id:'MWAvisosCorreo20261004',name:'Multisoluciones Web - Entregar avisos de correo',active:false,nodes:workerNodes,connections:workerConnections,settings:{executionOrder:'v1',executionTimeout:120},pinData:{},staticData:null};
+writeFileSync(`${outputDirectory}/receiver.json`,JSON.stringify([receiver],null,2));
+writeFileSync(`${outputDirectory}/worker.json`,JSON.stringify([worker],null,2));
+// Preserve the existing flow and its published brand template, adding SMTP
+// history so incoming replies can be related to the right request.
+const registrationName='Registrar acuse enviado al cliente y su identificador SMTP';
+const registration=db(registrationName,sql('register_outbound_email'),"={{ [$('Buscar Clientes existentes').item.json.contact_id, $('Buscar Clientes existentes').item.json.request_id, $json.messageId || null, $('Determinar idioma de respuesta').item.json.idioma_respuesta === 'es' ? 'Recibimos tu mensaje | Multisoluciones Web' : 'We received your message | Multisoluciones Web', 'Acuse automático de recepción enviado al cliente'] }}",[900,128]);
+current.nodes.push(registration);
+current.connections['Enviar acuse de recibo al cliente']={main:[[{node:registrationName,type:'main',index:0}]]};
+connect(current.connections,registrationName,'Responder al formulario de contacto web');
+const webQuery=current.nodes.find(n=>n.name==='Buscar Clientes existentes');
+webQuery.parameters.query=webQuery.parameters.query
+  .replace('(email_normalized,email_original,full_name,is_test) SELECT email_normalized,email_original,full_name,is_test FROM payload','(email_normalized,email_original,full_name,is_test,locale) SELECT email_normalized,email_original,full_name,is_test,locale FROM payload')
+  .replace('full_name=EXCLUDED.full_name,last_contact_at','full_name=EXCLUDED.full_name,locale=EXCLUDED.locale,last_contact_at');
+// Import as a draft; publish only after validating the new DB schema.
+current.name='Multisoluciones Web - Formulario y preferencias de contacto';
+current.active=false; delete current.activeVersionId; delete current.shared;
+writeFileSync(`${outputDirectory}/contact-with-history.json`,JSON.stringify([current],null,2));
+console.log('Generated inactive receiver and notification worker; publication requires tested DB and credentials.');
