@@ -1,10 +1,15 @@
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
+import Image from 'next/image';
+import { PhoneCallIcon, WhatsappLogoIcon, SquaresFourIcon, ArrowRightIcon, ChatsCircleIcon, BlueprintIcon, CodeIcon } from '@phosphor-icons/react/ssr';
 import { Link } from '@/i18n/routing';
 import { ContactForm } from '@/components/contact-form';
 import { IndustryShowcase } from '@/components/industry-showcase';
+import { ServiceCards } from '@/components/service-cards';
+import { getVisualCopy } from '@/components/visual-copy';
 
 export default async function IndexPage() {
   const t = await getTranslations('HomePage');
+  const copy = getVisualCopy(await getLocale());
 
   return (
     <div className="space-y-28 sm:space-y-36">
@@ -19,10 +24,10 @@ export default async function IndexPage() {
             <p className="mt-7 max-w-3xl text-lg leading-8 text-muted sm:text-xl sm:leading-9">{t('intro')}</p>
             <div className="mt-9 flex flex-wrap gap-3">
               <a className="inline-flex items-center justify-center rounded-full bg-brand px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-strong focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand dark:text-[#10232a]" href="tel:+17023379581">
-                {t('callAction')} <span aria-hidden="true" className="ml-2">↗</span>
+                <PhoneCallIcon size={20} aria-hidden="true" className="mr-2" />{t('callAction')}
               </a>
               <Link className="inline-flex items-center justify-center rounded-full border border-brand/50 bg-background/60 px-6 py-3.5 text-sm font-semibold text-foreground transition hover:border-brand hover:bg-background" href="/services">
-                {t('servicesAction')}
+                <SquaresFourIcon size={20} aria-hidden="true" className="mr-2" />{t('servicesAction')}
               </Link>
             </div>
           </div>
@@ -38,21 +43,13 @@ export default async function IndexPage() {
           </div>
           <p className="max-w-xl text-base leading-7 text-muted md:justify-self-end">{t('servicesIntro')}</p>
         </div>
-        <div className="divide-y divide-border">
-          {[
-            ['01', t('serviceWeb'), t('serviceWebText')],
-            ['02', t('serviceCommerce'), t('serviceCommerceText')],
-            ['03', t('serviceSystems'), t('serviceSystemsText')]
-          ].map(([number, title, text]) => (
-            <article className="grid gap-3 py-7 md:grid-cols-[4rem_1fr_1fr] md:items-start md:gap-8 md:py-8" key={number}>
-              <span className="pt-1 text-sm font-medium tabular-nums text-brand">{number}</span>
-              <h3 className="text-xl font-semibold tracking-tight text-foreground">{title}</h3>
-              <p className="max-w-xl text-base leading-7 text-muted">{text}</p>
-            </article>
-          ))}
-        </div>
+        <ServiceCards items={[
+          { title: t('serviceWeb'), text: t('serviceWebText') },
+          { title: t('serviceCommerce'), text: t('serviceCommerceText') },
+          { title: t('serviceSystems'), text: t('serviceSystemsText') }
+        ]} />
         <Link className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-strong hover:underline" href="/services">
-          {t('serviceMore')} <span aria-hidden="true">↗</span>
+          <SquaresFourIcon size={20} aria-hidden="true" />{t('serviceMore')} <ArrowRightIcon size={18} aria-hidden="true" />
         </Link>
       </section>
 
@@ -67,9 +64,10 @@ export default async function IndexPage() {
           <p className="max-w-2xl text-lg leading-8 text-muted">{t('approachText')}</p>
           <ol className="mt-8 grid gap-4 border-t border-border pt-6 sm:grid-cols-3">
             {[t('approachStepOne'), t('approachStepTwo'), t('approachStepThree')].map((step, index) => (
-              <li className="text-sm font-semibold leading-6" key={step}>
-                <span className="mb-2 block text-xs font-bold tabular-nums text-brand">0{index + 1}</span>
-                {step}
+              <li className="text-sm leading-6" key={step}>
+                {(() => { const Icon = [ChatsCircleIcon, BlueprintIcon, CodeIcon][index]; return <Icon aria-hidden="true" size={36} weight="duotone" className="mb-4 text-brand-strong" />; })()}
+                <h3 className="font-semibold">{step}</h3>
+                <p className="mt-2 text-muted">{copy.steps[index]}</p>
               </li>
             ))}
           </ol>
@@ -86,12 +84,15 @@ export default async function IndexPage() {
         </div>
         <div className="grid gap-5 pt-7 lg:grid-cols-2">
           <Link className="group rounded-3xl border border-border bg-background p-7 transition hover:border-brand/60 hover:bg-surface sm:p-9" href="/projects#rescuvo">
+            <Image src="/project-previews/rescuvo.webp" alt={copy.projectAlt[0]} width={1265} height={712} className="mb-6 aspect-video w-full rounded-2xl object-cover object-top" sizes="(min-width: 1024px) 550px, 100vw" />
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-strong">01 · Rescuvo</p>
             <h3 className="mt-8 text-2xl font-semibold tracking-tight">{t('rescuvoName')}</h3>
             <p className="mt-3 max-w-lg leading-7 text-muted">{t('rescuvoText')}</p>
             <span className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-strong">{t('projectsMore')} <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span></span>
           </Link>
           <Link className="group rounded-3xl border border-border bg-background p-7 transition hover:border-brand/60 hover:bg-surface sm:p-9" href="/projects#aprendiendo-a-programar">
+            <Image src="/project-previews/course.webp" alt={copy.projectAlt[1]} width={1280} height={720} className="mb-3 aspect-video w-full rounded-2xl object-cover object-top" sizes="(min-width: 1024px) 550px, 100vw" />
+            <p className="mb-6 text-xs text-muted">{copy.courseCaption}</p>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-strong">02 · Education</p>
             <h3 className="mt-8 text-2xl font-semibold tracking-tight">{t('courseName')}</h3>
             <p className="mt-3 max-w-lg leading-7 text-muted">{t('courseText')}</p>
@@ -106,8 +107,8 @@ export default async function IndexPage() {
           <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">{t('contactTitle')}</h2>
           <p className="mt-4 max-w-md leading-7 text-background/75">{t('contactText')}</p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <a className="inline-flex rounded-full border border-background/35 px-5 py-3 text-sm font-semibold transition hover:bg-background/10" href="tel:+17023379581">{t('callAction')}</a>
-            <a className="inline-flex rounded-full border border-background/35 px-5 py-3 text-sm font-semibold transition hover:bg-background/10" href="https://wa.me/17023379581?text=Hola%2C%20me%20interesa%20crear%20o%20mejorar%20mi%20sitio%20web.%20Me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n." rel="noreferrer" target="_blank">{t('whatsappAction')}</a>
+            <a className="inline-flex items-center gap-2 rounded-full border border-background/35 px-5 py-3 text-sm font-semibold transition hover:bg-background/10" href="tel:+17023379581"><PhoneCallIcon size={20} aria-hidden="true" />{t('callAction')}</a>
+            <a className="inline-flex items-center gap-2 rounded-full border border-background/35 px-5 py-3 text-sm font-semibold transition hover:bg-background/10" href="https://wa.me/17023379581?text=Hola%2C%20me%20interesa%20crear%20o%20mejorar%20mi%20sitio%20web.%20Me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n." rel="noreferrer" target="_blank"><WhatsappLogoIcon size={20} aria-hidden="true" />{t('whatsappAction')}</a>
           </div>
         </div>
         <div className="rounded-3xl bg-background p-6 text-foreground sm:p-8">

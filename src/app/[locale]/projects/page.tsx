@@ -1,8 +1,11 @@
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
+import Image from 'next/image';
+import { getVisualCopy } from '@/components/visual-copy';
 import { Link } from '@/i18n/routing';
 
 export default async function ProjectsPage() {
   const t = await getTranslations('Projects');
+  const copy = getVisualCopy(await getLocale());
 
   return (
     <div className="space-y-16 sm:space-y-24">
@@ -21,6 +24,7 @@ export default async function ProjectsPage() {
             <a className="mt-8 inline-flex rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-strong dark:text-[#10232a]" href="https://rescuvo.com" rel="noreferrer" target="_blank">{t('rescuvoAction')} <span aria-hidden="true" className="ml-2">↗</span></a>
           </div>
           <div className="max-w-2xl">
+            <Image src="/project-previews/rescuvo.webp" alt={copy.projectAlt[0]} width={1265} height={712} className="mb-7 w-full rounded-2xl" sizes="(min-width: 1024px) 650px, 100vw" />
             <p className="text-lg leading-8 text-muted">{t('rescuvoText')}</p>
             <div className="mt-8 border-t border-border pt-6">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-strong">{t('rescuvoWork')}</p>
@@ -35,6 +39,10 @@ export default async function ProjectsPage() {
             <span className="mt-5 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted">{t('courseStatus')}</span>
           </div>
           <div className="max-w-2xl">
+            <figure className="mb-7">
+              <Image src="/project-previews/course.webp" alt={copy.projectAlt[1]} width={1280} height={720} className="w-full rounded-2xl" sizes="(min-width: 1024px) 650px, 100vw" />
+              <figcaption className="mt-3 text-xs text-muted">{copy.courseCaption}</figcaption>
+            </figure>
             <p className="text-lg leading-8 text-muted">{t('courseText')}</p>
             <div className="mt-8 border-t border-border pt-6">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-strong">{t('courseWork')}</p>

@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
+import { ServiceCards } from '@/components/service-cards';
 
 const serviceRows = [
   { number: '01', title: 'webTitle', text: 'webText' },
@@ -20,15 +21,7 @@ export default async function ServicesPage() {
         <p className="max-w-2xl text-lg leading-8 text-muted md:justify-self-end">{t('intro')}</p>
       </header>
 
-      <div className="divide-y divide-border border-y border-border">
-        {serviceRows.map((service) => (
-          <article className="grid gap-3 py-8 md:grid-cols-[4rem_1fr_1fr] md:items-start md:gap-8 md:py-10" key={service.number}>
-            <span className="pt-1 text-sm font-medium tabular-nums text-brand">{service.number}</span>
-            <h2 className="text-2xl font-semibold tracking-tight">{t(service.title)}</h2>
-            <p className="max-w-xl text-base leading-7 text-muted">{t(service.text)}</p>
-          </article>
-        ))}
-      </div>
+      <ServiceCards items={serviceRows.map(service => ({ title: t(service.title), text: t(service.text) }))} />
 
       <section className="flex flex-col gap-6 rounded-[2rem] bg-hero p-8 sm:flex-row sm:items-center sm:justify-between sm:p-11">
         <div className="max-w-2xl">
