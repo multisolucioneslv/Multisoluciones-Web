@@ -1,12 +1,13 @@
 'use client';
 
 import { useActionState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { submitContact, type ContactState } from '@/app/[locale]/actions';
 
 const initialState: ContactState = { status: 'idle' };
 
 export function ContactForm() {
+  const locale = useLocale();
   const t = useTranslations('ContactForm');
   const [state, formAction, pending] = useActionState(submitContact, initialState);
 
@@ -14,6 +15,7 @@ export function ContactForm() {
 
   return (
     <form action={formAction} className="grid gap-5">
+      <input name="locale" type="hidden" value={locale} />
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="text-sm font-semibold text-foreground">
           {t('name')}
@@ -47,6 +49,7 @@ export function ContactForm() {
       <p className="text-sm leading-6 text-muted">{t('privacy')}</p>
       <div aria-live="polite" className="min-h-6 text-sm font-medium" role="status">
         {state.status === 'success' ? <p className="text-brand-strong">{t('success')}</p> : null}
+        {state.status === 'mockSuccess' ? <p className="text-brand-strong">{t('mockSuccess')}</p> : null}
         {state.status === 'failure' ? <p className="text-red-700 dark:text-red-300">{t('failure')}</p> : null}
         {state.status === 'notConfigured' ? <p className="text-amber-800 dark:text-amber-200">{t('notConfigured')}</p> : null}
         {state.status === 'invalid' ? <p className="text-red-700 dark:text-red-300">{t('invalid')}</p> : null}

@@ -235,10 +235,29 @@
     "submit": "Send inquiry",
     "sending": "Sending…",
     "privacy": "We will use these details only to respond to your inquiry.",
-    "success": "Thanks. Your inquiry was accepted in this local preview; no email was sent.",
-    "failure": "The local preview could not accept the inquiry. Please try again.",
+    "success": "Thanks. We received your inquiry. Please check your email for a confirmation.",
+    "mockSuccess": "Thanks. This local preview accepted the inquiry; no email was sent.",
+    "failure": "We couldn't submit your inquiry. Please try again.",
     "notConfigured": "Online delivery is not configured yet. Please call or message us instead.",
     "invalid": "Please check the required fields and try again.",
     "honeypot": "Leave this field empty"
+  },
+  "ContactPreference": {
+    "title": "How would you prefer us to contact you?",
+    "description": "Thanks for reaching out. Choose how you would like us to follow up about your request. If you choose a call or WhatsApp, provide the relevant number.",
+    "choose": "Choose one option",
+    "email": "I prefer to continue by email",
+    "call": "I prefer a phone call",
+    "whatsapp": "I prefer to be contacted on WhatsApp",
+    "none": "I don't want additional follow-up; just reply to my current request",
+    "phone": "Phone number",
+    "phonePlaceholder": "+1 702 555 0123",
+    "submit": "Save preference",
+    "saving": "Saving…",
+    "success": "Done. Your preference for this request has been saved.",
+    "failure": "We couldn't save it. The link may have expired or already been used.",
+    "notConfigured": "Preference selection is not enabled yet.",
+    "invalid": "Check your selection and phone number."
+  }
   }
 }

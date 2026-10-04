@@ -235,10 +235,29 @@
     "submit": "Enviar consulta",
     "sending": "Enviando…",
     "privacy": "Usaremos estos datos únicamente para responder a tu consulta.",
-    "success": "Gracias. Esta vista local aceptó la consulta; no se envió ningún correo.",
-    "failure": "La vista local no pudo aceptar la consulta. Inténtalo de nuevo.",
+    "success": "Gracias. Recibimos tu consulta. Revisa tu correo: te enviamos una confirmación.",
+    "mockSuccess": "Gracias. Esta vista local aceptó la consulta; no se envió ningún correo.",
+    "failure": "No pudimos enviar tu consulta. Inténtalo de nuevo.",
     "notConfigured": "El envío en línea aún no está configurado. Llámanos o escríbenos, por favor.",
     "invalid": "Revisa los campos obligatorios e inténtalo de nuevo.",
     "honeypot": "Deja este campo vacío"
+  },
+  "ContactPreference": {
+    "title": "¿Cómo prefieres que te contactemos?",
+    "description": "Gracias por escribirnos. Elige cómo prefieres recibir seguimiento sobre tu solicitud. Si eliges llamada o WhatsApp, indícanos el número correspondiente.",
+    "choose": "Selecciona una opción",
+    "email": "Prefiero continuar por correo electrónico",
+    "call": "Prefiero una llamada telefónica",
+    "whatsapp": "Prefiero que me contacten por WhatsApp",
+    "none": "No deseo seguimiento adicional; solo la respuesta a mi solicitud actual",
+    "phone": "Número de teléfono",
+    "phonePlaceholder": "+1 702 555 0123",
+    "submit": "Guardar preferencia",
+    "saving": "Guardando…",
+    "success": "Listo. Guardamos tu preferencia para esta solicitud.",
+    "failure": "No se pudo guardar. El enlace puede haber vencido o ya se utilizó.",
+    "notConfigured": "La selección de preferencias aún no está habilitada.",
+    "invalid": "Revisa tu selección y el número de teléfono."
+  }
   }
 }
