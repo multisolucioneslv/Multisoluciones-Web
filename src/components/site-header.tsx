@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LocaleSwitcher } from '@/components/locale-switcher';
+import { BrandLogo } from '@/components/brand-logo';
 
 const navigationItems = [
   { href: '/', key: 'home' },
@@ -29,13 +30,14 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-xl transition-colors">
       <nav className="mx-auto flex min-h-[4.5rem] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
-        <div className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
-          <Link href="/" onClick={closeMenu}>
-            <span>Multisoluciones</span><span className="ml-1 text-brand">Web</span>
+        <div className="text-sm font-bold tracking-tight text-foreground sm:text-xl">
+          <Link href="/" onClick={closeMenu} className="flex items-center gap-2 sm:gap-3">
+            <BrandLogo />
+            <span className="leading-tight"><span>Multisoluciones</span><span className="block text-brand sm:ml-1 sm:inline">Web</span></span>
           </Link>
         </div>
 
-        <div className="hidden items-center gap-6 md:flex">
+        <div className="hidden items-center gap-6 lg:flex">
           <ul className="flex space-x-2 text-sm font-medium text-muted">
             {navigationItems.map((item) => (
               <li key={item.href}>
@@ -58,7 +60,7 @@ export function SiteHeader() {
           <ThemeToggle />
         </div>
 
-        <div className="flex items-center gap-3 md:hidden">
+        <div className="flex items-center gap-3 lg:hidden">
           <LocaleSwitcher />
           <ThemeToggle />
           <button
@@ -90,7 +92,7 @@ export function SiteHeader() {
       {isMenuOpen ? (
         <div
           id="mobile-navigation"
-          className="border-t border-border bg-background px-5 py-4 md:hidden"
+          className="border-t border-border bg-background px-5 py-4 lg:hidden"
         >
           <ul className="mx-auto flex max-w-7xl flex-col gap-2 text-base font-medium text-muted">
             {navigationItems.map((item) => (
