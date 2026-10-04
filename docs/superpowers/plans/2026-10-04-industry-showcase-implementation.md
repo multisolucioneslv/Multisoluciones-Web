@@ -8,6 +8,11 @@
 
 **Tecnologías:** Next.js 16, React 19, TypeScript, Tailwind CSS 4, `next-intl` 4 y el generador de imágenes autorizado.
 
+## Recomendaciones incorporadas antes de crear las muestras
+
+- **Legibilidad antes que número de columnas:** cuatro columnas solo cuando permitan leer los titulares y servicios sin reducir excesivamente la tipografía. Si no caben, usar tres o dos columnas; no miniaturizar texto para cumplir la cuadrícula. Verificar a zoom 100% en escritorio y en móvil.
+- **No confundir rubros con servicios propios:** el encabezado y la explicación deben indicar explícitamente «Ejemplos de sitios web que podemos crear para negocios de estos rubros» (con traducción equivalente). Multisoluciones Web ofrece desarrollo web para esos negocios, no servicios de plomería, electricidad, reparación automotriz u otros oficios representados. Comprobar que esa distinción sea visible antes de la cuadrícula y no dependa únicamente del aviso de ejemplos ficticios.
+
 ---
 
 ## 1. Validar el marco técnico antes de editar
