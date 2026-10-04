@@ -28,7 +28,12 @@ export function BrandLogo() {
       </defs>
       <path d={braces} stroke="var(--brand)" strokeWidth="8" />
       <path d={mark} stroke={`url(#${gradientId})`} strokeWidth="12" />
-      <path d={mark} className="brand-logo-trace" pathLength="100" stroke="var(--brand-strong)" strokeWidth="4" strokeDasharray="5 95" />
+      {[braces, mark].map((path, index) => (
+        <g key={path} className={index === 0 ? 'brand-logo-runner brand-logo-braces' : 'brand-logo-runner'}>
+          <path d={path} className="brand-logo-trail" pathLength="100" stroke="var(--brand-logo-light)" strokeWidth="8" strokeDasharray="16 84" />
+          <path d={path} className="brand-logo-spark" pathLength="100" stroke="var(--brand-logo-light)" strokeWidth="13" strokeDasharray="1 99" />
+        </g>
+      ))}
     </svg>
   );
 }

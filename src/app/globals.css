@@ -52,8 +52,32 @@ body {
   color: #10232a;
 }
 
-.brand-logo-trace {
-  animation: brand-logo-light 3s linear infinite;
+.brand-logo-runner {
+  --brand-logo-light: #00b89c;
+  filter: drop-shadow(0 0 2px var(--brand-logo-light));
+}
+
+[data-theme="dark"] .brand-logo-runner,
+.dark .brand-logo-runner {
+  --brand-logo-light: #e0fff8;
+}
+
+.brand-logo-trail,
+.brand-logo-spark {
+  animation: brand-logo-light 2.4s linear infinite;
+}
+
+.brand-logo-trail {
+  opacity: 0.55;
+  animation-delay: -0.36s;
+}
+
+.brand-logo-braces .brand-logo-trail {
+  animation-delay: -1.56s;
+}
+
+.brand-logo-braces .brand-logo-spark {
+  animation-delay: -1.2s;
 }
 
 @keyframes brand-logo-light {
@@ -62,7 +86,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .brand-logo-trace {
+  .brand-logo-runner {
     display: none;
   }
   *,

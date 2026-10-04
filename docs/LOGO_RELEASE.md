@@ -17,3 +17,12 @@ Publicado el 2026-10-04 en `https://multisoluciones.online/es`.
 
 Esta versión recrea el monograma en vector; no convierte los MP4 a un formato
 con canal alfa ni pretende conservar exactamente todos sus fotogramas.
+
+## Corrección de visibilidad del movimiento
+
+El 2026-10-04 se sustituyó el trazo apenas perceptible por dos corredores
+luminosos, sobre las letras y las llaves, con punto y estela. Ciclo de 2.4 segundos,
+verde intenso en claro y blanco menta en oscuro. Se verificó en el dominio que
+`stroke-dashoffset` cambia entre observaciones (47.9208 a 5.5625 en las llaves),
+no únicamente que exista una declaración CSS. Lint y build de producción pasan.
+Copia previa: `/opt/multisoluciones-web-v2-pre-motion-20261004`.
