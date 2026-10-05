@@ -3,7 +3,12 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 const [auditDirectory, outputDirectory = auditDirectory] = process.argv.slice(2);
 if (!auditDirectory) throw new Error('Usage: node automation/build-mail-workflows.mjs AUDIT_DIRECTORY [OUTPUT_DIRECTORY]');
-const load = (file) => JSON.parse(readFileSync(`${auditDirectory}/${file}`, 'utf8'))[0];
+// n8n exports one workflow as an object. Earlier protected audit exports used
+// a one-item array, so accept both without changing the imported workflow.
+const load = (file) => {
+  const parsed = JSON.parse(readFileSync(`${auditDirectory}/${file}`, 'utf8'));
+  return Array.isArray(parsed) ? parsed[0] : parsed;
+};
 const current = load('contact.json');
 const old = load('old-imap.json');
 const postgres = current.nodes.find(n => n.type.endsWith('.postgres')).credentials;
