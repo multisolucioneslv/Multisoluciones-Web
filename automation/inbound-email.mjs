@@ -128,3 +128,43 @@ export function buildAdminNotification(result, contact = {}) {
     'Teléfono: ' + (result.phone || 'sin cambio'), '', result.email.freshText,
   ].join('\n') };
 }
+
+// Telegram is deliberately a summary-only channel. Neither customer bodies,
+// preference tokens nor arbitrary subject text belong in an administrative
+// notification that may be displayed on a phone lock screen.
+export function buildTelegramNotification(payload = {}, contact = {}) {
+  const source = payload.source;
+  const summary = (value, limit = 120) => singleLine(value, limit)
+    .replace(/[<>`*_\[\]{}]/g, '')
+    .trim();
+  const name = summary(contact.full_name || contact.name || payload.contact?.name) || 'Sin nombre';
+  const email = address(contact.email || payload.contact?.email) || 'sin correo válido';
+
+  if (source === 'web_form') {
+    const service = summary(payload.service) || 'Sin especificar';
+    return [
+      '🔔 Nuevo contacto desde Multisoluciones Web',
+      '',
+      `Cliente: ${name}`,
+      `Correo: ${email}`,
+      `Servicio: ${service}`,
+      '',
+      'Revisa info@multisoluciones.online para el detalle.',
+    ].join('\n');
+  }
+
+  if (payload.preferenceApplied && ['call', 'whatsapp'].includes(payload.preference)) {
+    const channel = payload.preference === 'call' ? 'llamada' : 'WhatsApp';
+    return [
+      '📞 Preferencia de contacto actualizada',
+      '',
+      `Cliente: ${name}`,
+      `Correo: ${email}`,
+      `Canal: ${channel}`,
+      '',
+      'Revisa info@multisoluciones.online para el detalle.',
+    ].join('\n');
+  }
+
+  return null;
+}

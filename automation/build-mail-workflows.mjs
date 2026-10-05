@@ -9,6 +9,10 @@ const old = load('old-imap.json');
 const postgres = current.nodes.find(n => n.type.endsWith('.postgres')).credentials;
 const smtp = current.nodes.find(n => n.type.endsWith('.emailSend')).credentials;
 const imap = old.nodes.find(n => n.type.endsWith('.emailReadImap')).credentials;
+const telegramNode = old.nodes.find(n => n.type.endsWith('.telegram'));
+const telegram = telegramNode?.credentials?.telegramApi;
+const telegramChatId = telegramNode?.parameters?.chatId;
+if (!telegram || !telegramChatId) throw new Error('The audit export does not contain a Telegram credential and chat destination');
 const source = readFileSync(new URL('./inbound-email.mjs', import.meta.url), 'utf8').replace(/^export /gm, '');
 const renderer = readFileSync(new URL('./contact-email.mjs', import.meta.url), 'utf8').replace(/^export /gm, '');
 const sql = file => readFileSync(new URL(`../database/queries/${file}.sql`, import.meta.url), 'utf8');
@@ -36,19 +40,24 @@ const adminName='Enviar aviso de correo a administración';
 const replyName='Enviar confirmación al cliente por correo';
 const workerNodes=[
   node('Revisar avisos pendientes cada minuto','scheduleTrigger',{rule:{interval:[{field:'minutes',minutesInterval:1}]}},[0,0],null,1.2),
-  db('Reservar avisos pendientes sin duplicarlos',`WITH jobs AS (SELECT id FROM public.email_notifications WHERE state='pending' AND kind IN ('admin','reply') ORDER BY id FOR UPDATE SKIP LOCKED LIMIT 20) UPDATE public.email_notifications n SET state='processing',claim_token=$1,claimed_at=now() FROM jobs WHERE n.id=jobs.id RETURNING n.*;`,"={{ [String($execution.id)] }}",[240,0]),
-  code('Preparar correo con idioma y diseño de marca',source+'\n'+renderer+`\nreturn $input.all().map((item,index)=> { const job=item.json; const result=job.payload; const contact=result.contact || {}; const content=job.kind==='admin'?buildAdminNotification(result,contact):buildIncomingReply(result,contact); if (!content) throw new Error('Notification without content'); return {json:{...job,to:job.kind==='admin'?'info@multisoluciones.online':content.to,subject:content.subject,text:content.text,html:renderContactEmail({...content,language:job.kind==='admin'?'es':result.language})},pairedItem:{item:index}}; });`,[480,0]),
+  db('Reservar avisos pendientes sin duplicarlos',`WITH jobs AS (SELECT id FROM public.email_notifications WHERE state='pending' AND kind IN ('admin','reply','telegram') ORDER BY id FOR UPDATE SKIP LOCKED LIMIT 20) UPDATE public.email_notifications n SET state='processing',claim_token=$1,claimed_at=now() FROM jobs WHERE n.id=jobs.id RETURNING n.*;`,"={{ [String($execution.id)] }}",[240,0]),
+  code('Preparar avisos de correo y Telegram',source+'\n'+renderer+`\nreturn $input.all().map((item,index)=> { const job=item.json; const result=job.payload; const contact=result.contact || {}; if (job.kind==='telegram') { const text=buildTelegramNotification(result,contact); if (!text) throw new Error('Telegram notification without safe summary'); return {json:{...job,text},pairedItem:{item:index}}; } const content=job.kind==='admin'?buildAdminNotification(result,contact):buildIncomingReply(result,contact); if (!content) throw new Error('Notification without content'); return {json:{...job,to:job.kind==='admin'?'info@multisoluciones.online':content.to,subject:content.subject,text:content.text,html:renderContactEmail({...content,language:job.kind==='admin'?'es':result.language})},pairedItem:{item:index}}; });`,[480,0]),
+  node('¿El aviso es Telegram?','if',{conditions:{options:{caseSensitive:true,leftValue:'',typeValidation:'strict',version:2},conditions:[{id:randomUUID(),leftValue:'={{ $json.kind }}',rightValue:'telegram',operator:{type:'string',operation:'equals'}}],combinator:'and'},options:{}},[720,0],null,2.2),
+  node('Notificar por Telegram - Multisoluciones Web','telegram',{resource:'message',operation:'sendMessage',chatId:telegramChatId,text:'={{ $json.text }}',additionalFields:{}},[960,-220],{telegramApi:telegram},1),
   node('¿El aviso es para administración?','if',{conditions:{options:{caseSensitive:true,leftValue:'',typeValidation:'strict',version:2},conditions:[{id:randomUUID(),leftValue:'={{ $json.kind }}',rightValue:'admin',operator:{type:'string',operation:'equals'}}],combinator:'and'},options:{}},[720,0],null,2.2),
   node(adminName,'emailSend',{fromEmail:'Multisoluciones Web <info@multisoluciones.online>',toEmail:'={{ $json.to }}',subject:'={{ $json.subject }}',emailFormat:'both',text:'={{ $json.text }}',html:'={{ $json.html }}',options:{appendAttribution:false}},[960,-100],smtp,2.1),
   node(replyName,'emailSend',{fromEmail:'Multisoluciones Web <info@multisoluciones.online>',toEmail:'={{ $json.to }}',subject:'={{ $json.subject }}',emailFormat:'both',text:'={{ $json.text }}',html:'={{ $json.html }}',options:{appendAttribution:false,replyTo:'info@multisoluciones.online'}},[960,100],smtp,2.1),
-  db('Registrar aviso enviado a administración',sql('complete_email_notification'),"={{ [$('Preparar correo con idioma y diseño de marca').item.json.id, $('Preparar correo con idioma y diseño de marca').item.json.claim_token, $json.error ? 'uncertain' : 'sent', $json.messageId || null, $json.error || null] }}",[1200,-100]),
-  db('Registrar confirmación enviada y su identificador SMTP',`WITH completed AS (${sql('complete_email_notification').replace(/;\s*$/,'')}) INSERT INTO public.messages(contact_id,request_id,direction,channel,body,is_test,email_message_id,email_subject) SELECT c.id,$6::bigint,'outbound','email',$7::text,c.is_test,$4::text,$8::text FROM completed n JOIN public.email_notifications j ON j.id=n.id JOIN public.contacts c ON c.id=j.contact_id WHERE n.state='sent' AND $4::text IS NOT NULL ON CONFLICT (email_message_id) WHERE email_message_id IS NOT NULL DO NOTHING RETURNING id;`,"={{ [$('Preparar correo con idioma y diseño de marca').item.json.id, $('Preparar correo con idioma y diseño de marca').item.json.claim_token, $json.error ? 'uncertain' : 'sent', $json.messageId || null, $json.error || null, $('Preparar correo con idioma y diseño de marca').item.json.request_id, $('Preparar correo con idioma y diseño de marca').item.json.text, $('Preparar correo con idioma y diseño de marca').item.json.subject] }}",[1200,100])
+  db('Registrar aviso Telegram entregado',sql('complete_email_notification'),"={{ [$('Preparar avisos de correo y Telegram').item.json.id, $('Preparar avisos de correo y Telegram').item.json.claim_token, $json.error ? 'uncertain' : 'sent', null, $json.error || null] }}",[1200,-220]),
+  db('Registrar aviso enviado a administración',sql('complete_email_notification'),"={{ [$('Preparar avisos de correo y Telegram').item.json.id, $('Preparar avisos de correo y Telegram').item.json.claim_token, $json.error ? 'uncertain' : 'sent', $json.messageId || null, $json.error || null] }}",[1200,-100]),
+  db('Registrar confirmación enviada y su identificador SMTP',`WITH completed AS (${sql('complete_email_notification').replace(/;\s*$/,'')}) INSERT INTO public.messages(contact_id,request_id,direction,channel,body,is_test,email_message_id,email_subject) SELECT c.id,$6::bigint,'outbound','email',$7::text,c.is_test,$4::text,$8::text FROM completed n JOIN public.email_notifications j ON j.id=n.id JOIN public.contacts c ON c.id=j.contact_id WHERE n.state='sent' AND $4::text IS NOT NULL ON CONFLICT (email_message_id) WHERE email_message_id IS NOT NULL DO NOTHING RETURNING id;`,"={{ [$('Preparar avisos de correo y Telegram').item.json.id, $('Preparar avisos de correo y Telegram').item.json.claim_token, $json.error ? 'uncertain' : 'sent', $json.messageId || null, $json.error || null, $('Preparar avisos de correo y Telegram').item.json.request_id, $('Preparar avisos de correo y Telegram').item.json.text, $('Preparar avisos de correo y Telegram').item.json.subject] }}",[1200,100])
 ];
-for (const n of workerNodes.filter(n=>n.type.endsWith('.emailSend'))) n.onError='continueRegularOutput';
+for (const n of workerNodes.filter(n=>n.type.endsWith('.emailSend') || n.type.endsWith('.telegram'))) n.onError='continueRegularOutput';
 const workerConnections={};
 workerNodes.slice(1,4).forEach((n,i)=>connect(workerConnections,workerNodes[i].name,n.name));
-connect(workerConnections,workerNodes[3].name,adminName,0);connect(workerConnections,workerNodes[3].name,replyName,1);
-connect(workerConnections,adminName,workerNodes[6].name);connect(workerConnections,replyName,workerNodes[7].name);
+connect(workerConnections,workerNodes[3].name,'Notificar por Telegram - Multisoluciones Web',0);connect(workerConnections,workerNodes[3].name,'¿El aviso es para administración?',1);
+connect(workerConnections,'¿El aviso es para administración?',adminName,0);connect(workerConnections,'¿El aviso es para administración?',replyName,1);
+connect(workerConnections,adminName,workerNodes[9].name);connect(workerConnections,replyName,workerNodes[10].name);
+connect(workerConnections,'Notificar por Telegram - Multisoluciones Web',workerNodes[8].name);
 const worker={id:'MWAvisosCorreo20261004',name:'Multisoluciones Web - Entregar avisos de correo',active:false,nodes:workerNodes,connections:workerConnections,settings:{executionOrder:'v1',executionTimeout:120},pinData:{},staticData:null};
 writeFileSync(`${outputDirectory}/receiver.json`,JSON.stringify([receiver],null,2));
 writeFileSync(`${outputDirectory}/worker.json`,JSON.stringify([worker],null,2));
@@ -63,6 +72,12 @@ const webQuery=current.nodes.find(n=>n.name==='Buscar Clientes existentes');
 webQuery.parameters.query=webQuery.parameters.query
   .replace('(email_normalized,email_original,full_name,is_test) SELECT email_normalized,email_original,full_name,is_test FROM payload','(email_normalized,email_original,full_name,is_test,locale) SELECT email_normalized,email_original,full_name,is_test,locale FROM payload')
   .replace('full_name=EXCLUDED.full_name,last_contact_at','full_name=EXCLUDED.full_name,locale=EXCLUDED.locale,last_contact_at');
+if (!webQuery.parameters.query.includes('telegram_notification AS')) {
+  webQuery.parameters.query=webQuery.parameters.query.replace(
+    'RETURNING id) SELECT contact.id AS contact_id',
+    `RETURNING id), telegram_notification AS (INSERT INTO public.email_notifications(contact_id,request_id,message_id,kind,payload) SELECT new_request.contact_id,new_request.id,new_message.id,'telegram',jsonb_build_object('source','web_form','contact',jsonb_build_object('name',payload.full_name,'email',contact.email_normalized),'service',payload.service_key,'requestId',new_request.id,'messageId',new_message.id) FROM new_request CROSS JOIN new_message CROSS JOIN contact CROSS JOIN payload ON CONFLICT (message_id,kind) DO NOTHING RETURNING id) SELECT contact.id AS contact_id`
+  );
+}
 // Import as a draft; publish only after validating the new DB schema.
 current.name='Multisoluciones Web - Formulario y preferencias de contacto';
 current.active=false; delete current.activeVersionId; delete current.shared;
