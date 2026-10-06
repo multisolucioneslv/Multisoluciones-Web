@@ -70,7 +70,7 @@ function explicitChoice(text) {
 export function classifyIncomingEmail({ email, contact, knownRequests = [], duplicate = false } = {}) {
   const envelope = normalizeImapEmail(email);
   const language = contact?.locale === 'es' ? 'es' : 'en';
-  const result = { action: 'ignore', reason: '', email: envelope, language, requestId: null, correlation: 'unmatched', preference: null, phone: null, saveMessage: false, notifyAdmin: false, sendReply: false };
+  const result = { action: 'ignore', reason: '', email: envelope, language, requestId: null, correlation: 'unmatched', preference: null, phone: null, saveMessage: false, notifyAdmin: false, notifyTelegram: false, sendReply: false };
   const ignore = (reason) => ({ ...result, reason });
   if (!envelope.from) return ignore('invalid_sender');
   if (envelope.from === 'info@multisoluciones.online' || envelope.generated || envelope.headers['x-multisoluciones-generated']) return ignore('own_or_generated');
@@ -78,8 +78,10 @@ export function classifyIncomingEmail({ email, contact, knownRequests = [], dupl
   const h = envelope.headers;
   if ((h['auto-submitted'] && h['auto-submitted'].toLowerCase() !== 'no') || h['list-id'] || h['list-unsubscribe'] || /\b(?:bulk|list|junk)\b/i.test(h.precedence || '') || h['x-autoreply'] || h['x-autorespond']) return ignore('automated');
   if (/^(?:mailer-daemon|postmaster)@/i.test(envelope.from) || h['return-path']?.trim() === '<>' || /(?:delivery-status|multipart\/report)/i.test(h['content-type'] || '') || /^(?:automatic reply|auto[- ]?reply|out of office|respuesta automatica|respuesta automática|fuera de (?:la )?oficina|undeliverable|delivery (?:status|failure)|mail delivery failed)/i.test(envelope.subject)) return ignore('bounce_or_auto_reply');
-  if (!contact || address(contact.email) !== envelope.from) return ignore('unknown_contact');
   if (!envelope.messageId) return ignore('missing_message_id');
+  if (!contact || address(contact.email) !== envelope.from) {
+    return { ...result, action: 'new_sender', reason: 'unknown_contact', notifyTelegram: true };
+  }
   const matched = knownRequests.filter((request) => {
     const outbound = ids([request.outbound_message_id, request.outboundMessageId, ...(request.outboundMessageIds || []), ...(request.outbound_message_ids || [])].filter(Boolean));
     return outbound.some((id) => envelope.references.includes(id));
@@ -91,7 +93,7 @@ export function classifyIncomingEmail({ email, contact, knownRequests = [], dupl
   result.language = (matchedRequest?.locale ?? contact.locale) === 'es' ? 'es' : 'en';
   const selection = explicitChoice(envelope.freshText);
   const phones = [...new Set((envelope.freshText.match(/\+[1-9][\d ().-]{6,25}\d/g) || []).map((value) => value.replace(/[^+\d]/g, '')).filter((value) => /^\+[1-9]\d{7,14}$/.test(value)))];
-  result.action = 'save'; result.reason = 'ordinary_message'; result.saveMessage = true; result.notifyAdmin = true;
+  result.action = 'save'; result.reason = 'ordinary_message'; result.saveMessage = true; result.notifyAdmin = true; result.notifyTelegram = true;
   if (selection.evident && (selection.ambiguous || !selection.choice || (['call', 'whatsapp'].includes(selection.choice) && phones.length !== 1))) {
     result.action = 'clarify'; result.reason = selection.ambiguous ? 'ambiguous_choice' : !selection.choice ? 'missing_channel' : 'missing_or_ambiguous_phone'; result.sendReply = true;
   } else if (selection.choice) {
@@ -139,6 +141,23 @@ export function buildTelegramNotification(payload = {}, contact = {}) {
     .trim();
   const name = summary(contact.full_name || contact.name || payload.contact?.name) || 'Sin nombre';
   const email = address(contact.email || payload.contact?.email) || 'sin correo válido';
+
+  if (source === 'inbound_email') {
+    const inbound = payload.email || {};
+    const sender = address(inbound.from || inbound.fromEmail);
+    if (!sender || !inbound.messageId) return null;
+    const subject = summary(inbound.subject, 120) || '(sin asunto)';
+    const status = payload.contact?.known === true ? 'Contacto conocido' : 'Remitente nuevo';
+    return [
+      '📩 Nuevo correo entrante',
+      '',
+      `De: ${sender}`,
+      `Asunto: ${subject}`,
+      `Estado: ${status}`,
+      '',
+      'Revisa info@multisoluciones.online para leerlo.',
+    ].join('\n');
+  }
 
   if (source === 'web_form') {
     const service = summary(payload.service) || 'Sin especificar';

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeImapEmail, classifyIncomingEmail, buildIncomingReply, buildAdminNotification } from './inbound-email.mjs';
+import { normalizeImapEmail, classifyIncomingEmail, buildIncomingReply, buildAdminNotification, buildTelegramNotification } from './inbound-email.mjs';
 const contact = { email: 'client@example.org', locale: 'es', name: 'Cliente' };
 const email = (text, extra = {}) => ({ from: { value: [{ address: contact.email }] }, messageId: '<inbound@example.org>', textPlain: text, ...extra });
 const classify = (text, extra = {}) => classifyIncomingEmail({ email: email(text), contact, ...extra });
@@ -14,15 +14,24 @@ test('normalizes structured IMAP and prevents header injection', () => {
   const parsed = normalizeImapEmail(email('Hola', { subject: 'Hola\r\nBcc: victim@example.org', headers: { 'In-Reply-To': '<out@example.org>' } }));
   assert.equal(parsed.from, contact.email); assert.ok(!parsed.subject.includes('\n')); assert.deepEqual(parsed.references, ['<out@example.org>']);
 });
-test('unknown, own, generated, duplicate and missing ID are ignored', () => {
+test('unknown legitimate senders get a Telegram alert only; filtered and unkeyed mail is ignored', () => {
+  const unknown = classifyIncomingEmail({email: email('Hello', {from:'new@example.org'})});
+  assert.equal(unknown.action, 'new_sender'); assert.equal(unknown.notifyTelegram, true);
+  assert.equal(unknown.saveMessage, false); assert.equal(unknown.notifyAdmin, false); assert.equal(unknown.sendReply, false);
+  const notification = buildTelegramNotification({source:'inbound_email',email:{from:'new@example.org',messageId:'<new@example.org>',subject:'Hello'},contact:{email:'new@example.org',known:false}});
+  assert.match(notification, /Remitente nuevo/); assert.doesNotMatch(notification, /Hello\\n/);
   for (const [extra, reason] of [
-    [{ contact: null }, 'unknown_contact'],
     [{ email: email('Hi', { from: 'info@multisoluciones.online' }) }, 'own_or_generated'],
     [{ email: email('Hi', { generated: true }) }, 'own_or_generated'],
     [{ duplicate: true }, 'duplicate'],
     [{ email: email('Hi', { duplicate: true }) }, 'duplicate'],
     [{ email: email('Hi', { messageId: '' }) }, 'missing_message_id'],
   ]) { const result = classify('Hi', extra); assert.equal(result.reason, reason); assert.equal(result.saveMessage, false); assert.equal(buildIncomingReply(result), null); }
+});
+test('direct mail Telegram alert is sanitized and never contains the body', () => {
+  const result = buildTelegramNotification({source:'inbound_email',email:{from:'client@example.org',messageId:'<id@example.org>',subject:'Hello\n<b>bad</b> _` [x]'},contact:{known:true},body:'SECRET BODY'});
+  assert.match(result,/De: client@example.org/); assert.match(result,/Contacto conocido/);
+  assert.doesNotMatch(result,/SECRET BODY|<|>|`/);
 });
 test('automated, bounce and list mail never produce replies', () => {
   for (const extra of [ {headers:{'Auto-Submitted':'auto-replied'}}, {headers:{'List-ID':'newsletter'}}, {headers:{'Return-Path':'<>'}}, {from:'mailer-daemon@example.org'}, {subject:'Out of office'}, {headers:{'Content-Type':'multipart/report; report-type=delivery-status'}} ]) {
