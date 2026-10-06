@@ -68,6 +68,14 @@ test('actual IMAP simple metadata raw header lines normalize and block automatic
   assert.equal(classifyIncomingEmail({email:actual,contact}).reason,'automated');
   assert.equal(parsed.receivedAt,'2026-10-04T10:00:00.000Z');
 });
+test('n8n Simple IMAP attribute headers preserve sender, Message-ID and date', () => {
+  const actual = {from:{value:[{address:'new@example.org'}]}, subject:'A new message', textPlain:'Hello', attributes:{date:'2026-10-05T12:00:00Z',headers:{'message-id':'<new-1@example.org>'}}};
+  const normalized = normalizeImapEmail(actual);
+  assert.equal(normalized.from,'new@example.org');
+  assert.equal(normalized.messageId,'<new-1@example.org>');
+  assert.equal(normalized.receivedAt,'2026-10-05T12:00:00.000Z');
+  assert.equal(classifyIncomingEmail({email:actual}).reason,'unknown_contact');
+});
 test('missing phone, conflicting choices and incomplete intent clarify', () => {
   for (const text of ['Llámame al 612345678', 'Prefiero WhatsApp', 'Prefiero correo y quiero una llamada', 'Please contact me', 'No quiero WhatsApp', 'Call me +14155550123 or +14155550999']) {
     const result = classify(text); assert.equal(result.action, 'clarify', text); assert.equal(result.preference, null); assert.ok(buildIncomingReply(result));

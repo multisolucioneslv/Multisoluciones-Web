@@ -19,15 +19,19 @@ export function stripQuotedText(value) {
 }
 export function normalizeImapEmail(payload = {}) {
   const data = payload.json || payload;
+  // n8n IMAP "Simple" format exposes parsed addresses/headers as objects and
+  // often nests the original RFC822 fields under attributes.
+  const attributes = data.attributes || data.attr || {};
+  const sourceHeaders = data.headers || data.header || data.metadata || attributes.headers || {};
   const headers = {};
   const headerKeys = ['message-id', 'in-reply-to', 'references', 'auto-submitted', 'list-id', 'list-unsubscribe', 'precedence', 'x-autoreply', 'x-autorespond', 'return-path', 'content-type', 'x-multisoluciones-generated', 'from', 'subject'];
   for (const key of headerKeys) if (data[key] != null) headers[key] = clean(Array.isArray(data[key]) ? data[key].join(' ') : data[key], 2000);
-  for (const sourceHeaders of [data.metadata, data.header, data.headers].filter(Boolean)) {
-    const entries = Array.isArray(sourceHeaders)
-      ? sourceHeaders.map((header) => typeof header === 'string'
+  for (const headerSet of [sourceHeaders, data.metadata, data.header, data.headers].filter(Boolean)) {
+    const entries = Array.isArray(headerSet)
+      ? headerSet.map((header) => typeof header === 'string'
         ? [header.split(':')[0], header]
         : [header.key || header.name || '', header.value || ''])
-      : Object.entries(sourceHeaders);
+      : Object.entries(headerSet);
     for (const [key, value] of entries) {
       const normalizedKey = String(key).toLowerCase();
       const raw = clean(Array.isArray(value) ? value.join(' ') : value, 2000);
@@ -37,12 +41,12 @@ export function normalizeImapEmail(payload = {}) {
     }
   }
   const text = clean(data.textPlain ?? data.text ?? (typeof data.body === 'string' ? data.body : ''));
-  const from = address(data.from || data.fromEmail || headers.from);
-  const rawDate = data.receivedAt || data.date || headers.date;
+  const from = address(data.from || data.fromEmail || data.sender || headers.from || attributes.from);
+  const rawDate = data.receivedAt || data.date || headers.date || attributes.date;
   const date = new Date(rawDate ? clean(Array.isArray(rawDate) ? rawDate[0] : rawDate).replace(/^date:\s*/i, '') : NaN);
   return {
     from, fromEmail: from, subject: singleLine(data.subject || headers.subject),
-    messageId: ids(data.messageId || data.message_id || headers['message-id'])[0] || '',
+    messageId: ids(data.messageId || data.message_id || data.messageID || headers['message-id'] || attributes['message-id'] || attributes.messageId)[0] || '',
     references: ids([data.inReplyTo, data.references, headers['in-reply-to'], headers.references].flat().filter(Boolean)),
     inReplyTo: ids(data.inReplyTo || headers['in-reply-to']).join(' '),
     receivedAt: Number.isNaN(date.getTime()) ? null : date.toISOString(),
