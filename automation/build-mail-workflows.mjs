@@ -1,6 +1,8 @@
 // Builds importable n8n artifacts from credential references, never decrypted secrets.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
+import { buildContactAck } from './contact-ack.mjs';
+import { renderContactEmail } from './contact-email.mjs';
 const [auditDirectory, outputDirectory = auditDirectory] = process.argv.slice(2);
 if (!auditDirectory) throw new Error('Usage: node automation/build-mail-workflows.mjs AUDIT_DIRECTORY [OUTPUT_DIRECTORY]');
 // n8n exports one workflow as an object. Earlier protected audit exports used
@@ -74,6 +76,12 @@ writeFileSync(`${outputDirectory}/worker.json`,JSON.stringify(worker,null,2));
 // history so incoming replies can be related to the right request.
 const registrationName='Registrar acuse enviado al cliente y su identificador SMTP';
 const registration=db(registrationName,sql('register_outbound_email'),"={{ [$('Buscar Clientes existentes').item.json.contact_id, $('Buscar Clientes existentes').item.json.request_id, $json.messageId || null, $('Determinar idioma de respuesta').item.json.idioma_respuesta === 'es' ? 'Recibimos tu mensaje | Multisoluciones Web' : 'We received your message | Multisoluciones Web', 'Acuse automático de recepción enviado al cliente'] }}",[900,128]);
+const acknowledgement=current.nodes.find(n=>n.name==='Enviar acuse de recibo al cliente');
+if (!acknowledgement) throw new Error('The contact workflow is missing the customer acknowledgment node');
+acknowledgement.parameters={...acknowledgement.parameters,
+  fromEmail:'Multisoluciones Web <info@multisoluciones.online>',
+  html:`={{ (() => { const buildContactAck = ${buildContactAck.toString()}; const renderContactEmail = ${renderContactEmail.toString()}; const form = $node["Entrada formulario web"].json.body; const contact = $node["Buscar Clientes existentes"].json; const locale = $node["Determinar idioma de respuesta"].json.idioma_respuesta; return renderContactEmail(buildContactAck({...form, locale}, contact)); })() }}`
+};
 current.nodes.push(registration);
 current.connections['Enviar acuse de recibo al cliente']={main:[[{node:registrationName,type:'main',index:0}]]};
 connect(current.connections,registrationName,'Responder al formulario de contacto web');

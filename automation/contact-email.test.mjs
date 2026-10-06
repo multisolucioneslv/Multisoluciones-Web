@@ -16,6 +16,8 @@ for (const locale of ['es', 'en', 'pt', 'ko']) {
       assert.ok(!html.includes('<img'));
       assert.ok(html.includes('#075e59'));
       assert.equal((html.match(/<table role="presentation" width="100%"/g) || []).length, 2);
+      assert.match(html, /width="100%"[^>]*style="width:100%;max-width:none;/);
+      assert.match(html, /<td align="left" width="100%" style="width:100%;padding:0;">/);
       assert.ok(!html.includes('max-width:600px'));
       assert.ok(!html.includes('Multisoluciones IA'));
       assert.ok(!html.includes('n8n'));

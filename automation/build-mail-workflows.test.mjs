@@ -36,4 +36,21 @@ test('direct-email receiver passes the normalized email object to classification
   assert.match(lookup.parameters.query, /\$3::jsonb AS email/);
   assert.doesNotMatch(lookup.parameters.query, /input\.email AS email/);
   assert.match(lookup.parameters.options.queryReplacement, /JSON\.stringify\(\$json\.email\)/);
+
+  const contactWorkflow = JSON.parse(readFileSync(join(output, 'contact-with-history.json'), 'utf8'));
+  const acknowledgement = contactWorkflow.nodes.find((node) => node.name === 'Enviar acuse de recibo al cliente');
+  assert.equal(acknowledgement.parameters.fromEmail, 'Multisoluciones Web <info@multisoluciones.online>');
+  assert.match(acknowledgement.parameters.html, /width="100%"/);
+  assert.doesNotMatch(acknowledgement.parameters.html, /max-width:600px|width="600"/);
+  const renderAcknowledgment = new Function('$node', `return ${acknowledgement.parameters.html.slice(3, -2)}`);
+  const html = renderAcknowledgment({
+    'Entrada formulario web': { json: { body: { name: 'Cliente de prueba' } } },
+    'Buscar Clientes existentes': { json: {
+      is_new: true, contact_preference: 'pending', preference_token: '11111111-1111-4111-8111-111111111111'
+    } },
+    'Determinar idioma de respuesta': { json: { idioma_respuesta: 'es' } }
+  });
+  assert.match(html, /width="100%"/);
+  assert.doesNotMatch(html, /max-width:600px|width="600"/);
+  assert.match(html, /Hola Cliente de prueba/);
 });
