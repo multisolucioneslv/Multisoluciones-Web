@@ -119,10 +119,14 @@ prueba/respaldo creados durante la implementación: `GMxnWRZMpKVnDCZG`,
 Pruebas recientes: se verificó la entrega del aviso de formulario a Telegram;
 el aviso y acuse de correo llegaron al buzón durante la prueba de producción;
 la preferencia `none` se guardó correctamente y se limpió después el contacto
-ficticio y sus registros relacionados. Antes de esa limpieza se creó el dump
-protegido `/opt/multisoluciones-web-backups/20261006-after-test-before-cleanup.dump`.
-Los contadores de contactos, solicitudes, mensajes, notificaciones y eventos de
-preferencia quedaron en cero tras limpiar los datos ficticios.
+ficticio y sus registros relacionados. Una prueba ficticia posterior a la
+publicación de las plantillas devolvió éxito en el formulario, registró el acuse
+saliente y dejó la notificación Telegram en `sent`. La bandeja no se inspeccionó
+para verificar visualmente el nuevo aviso administrativo. Antes de cada limpieza
+se creó un dump protegido; el respaldo más reciente es
+`/opt/multisoluciones-web-backups/20261006-before-template-email-test-cleanup.dump`
+(modo 600). Los contadores de contactos, solicitudes, mensajes, notificaciones
+y eventos de preferencia quedaron en cero tras limpiar los datos ficticios.
 
 El 2026-10-06 se publicó en el flujo `mrOly0udSli3SYQV` una plantilla HTML de
 ancho 100%, colores menta y escape de contenido para los dos avisos internos
@@ -130,9 +134,14 @@ ancho 100%, colores menta y escape de contenido para los dos avisos internos
 también el formato de texto alternativo; el acuse al cliente ya tenía HTML y
 texto. No se ejecutó una nueva prueba de envío tras esta última edición; debe
 validarse con el siguiente envío ficticio controlado antes de considerar la
-plantilla visual comprobada en la bandeja.
+plantilla visual comprobada en la bandeja. La prueba posterior confirmó el
+procesamiento del formulario, el acuse registrado y Telegram `sent`, pero no la
+apariencia del correo administrativo en una bandeja de entrada.
 
-El flujo de correo entrante general y el filtrado de remitentes nuevos siguen
-siendo una fase pendiente: la notificación de formulario y la entrega de la
-cola de avisos están activas, pero no debe afirmarse que toda la bandeja IMAP
-queda monitorizada hasta publicar y probar el receptor general y sus reglas.
+El receptor IMAP general y el worker de avisos están publicados; los tests
+cubren remitentes válidos/no válidos y el aviso Telegram de mensajes legítimos
+desconocidos. Sigue pendiente la política aprobada de responder por correo a
+remitentes nuevos legítimos con un acuse de revisión, así como validar en vivo
+los filtros de spam y la correlación de respuestas con el historial. El límite
+de tasa durable del endpoint público también está pendiente; el honeypot no lo
+sustituye. Por ello, el proceso aún no debe calificarse como 100% terminado.
