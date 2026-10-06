@@ -15,6 +15,8 @@ for (const locale of ['es', 'en', 'pt', 'ko']) {
       assert.ok(html.includes('&lt;img'));
       assert.ok(!html.includes('<img'));
       assert.ok(html.includes('#075e59'));
+      assert.equal((html.match(/<table role="presentation" width="100%"/g) || []).length, 2);
+      assert.ok(!html.includes('max-width:600px'));
       assert.ok(!html.includes('Multisoluciones IA'));
       assert.ok(!html.includes('n8n'));
       assert.equal((html.match(/href="https:\/\/multisoluciones.online[^\"]*\?channel=/g) || []).length, preference === 'pending' ? 4 : 0);
