@@ -1,8 +1,9 @@
 # Operaciones de Multisoluciones: Telegram, correo y contenido
 
-**Estado:** diseño aprobado el 2026-10-05.  
-**Alcance inmediato:** notificaciones de Telegram para el formulario web y la
-bandeja de entrada de Mailcow.  
+**Estado:** diseño base aprobado el 2026-10-05; ampliación operativa aceptada
+por el usuario el 2026-10-06, pendiente de revisión de este detalle escrito.
+**Alcance inmediato:** ordenar los flujos de Multisoluciones Web, completar
+avisos de Telegram/correo, y estandarizar la plantilla de correo.
 **No implementar aún:** envío de propuestas desde el bot, publicaciones en
 Facebook ni cambios visuales del sitio.
 
@@ -60,6 +61,47 @@ remitentes nuevos se registrarán en una entrada mínima de bandeja/cola que
 permita deduplicar por `Message-ID` sin crear un cliente ni una solicitud por
 suposición.
 
+Las respuestas de clientes también generarán aviso Telegram. Solo se marcarán
+como respuesta cuando referencias verificables las vinculen a una conversación;
+en otro caso el aviso dirá que es correo entrante sin conversación identificada.
+Spam, ofertas masivas, rebotes y respuestas automáticas no tendrán respuesta
+automática; señales ambiguas irán a revisión manual sin prometer seguimiento.
+
+### Preferencia de contacto tras el formulario
+
+El envío del formulario crea o actualiza el contacto con los datos disponibles,
+pero no implica consentimiento para seguimiento por llamada o WhatsApp. Se
+solicita la preferencia explícita en el enlace localizado de un solo uso. Si el
+contacto ya existe, se muestra el canal previamente autorizado como contexto;
+para esta solicitud se pide confirmar o elegir otra opción. No se infiere
+autorización futura desde preferencias antiguas. Si elige “no deseo seguimiento”,
+se registra la respuesta y solo se envía la confirmación necesaria de esa elección.
+
+### Plantilla de correo
+
+Los acuses al cliente y avisos administrativos compartirán una plantilla HTML
+compatible con clientes de correo, colores menta/turquesa del sitio, estilos en
+línea y alternativa de texto plano. El contenedor ocupará el 100% del ancho
+disponible, sin límite fijo de 600 px. El correo de administración podrá incluir
+el mensaje original para leer la consulta; Telegram seguirá siendo solo resumen.
+
+### Organización de flujos
+
+Los flujos de Multisoluciones Web viven en su carpeta de proyecto y usan
+nombres inequívocos tanto en el flujo como en nodos críticos. Rescuvo y
+Restaurantes conservan carpetas separadas; se auditan ubicaciones antes de
+mover cualquier flujo y nunca se reorganizan proyectos fuera del alcance sin
+identificar su pertenencia.
+
+### Limpieza segura
+
+Solo se eliminarán flujos de prueba/respaldo creados durante esta integración,
+tras comprobar ID, creador/procedencia, estado y reemplazo funcional. Flujos
+preexistentes apagados y flujos creados por el usuario quedan preservados.
+Los registros ficticios de PostgreSQL se identifican con respaldo previo y
+evidencia por fila; no se borran registros que puedan ser reales ni se usa
+únicamente el campo `is_test` si no representa fielmente el histórico.
+
 ## Límites de seguridad
 
 - Todo texto recibido desde formulario, correo o Telegram se considera dato no
@@ -107,19 +149,23 @@ datos de clientes ni integraciones administrativas.
 
 ## Orden de entrega
 
-1. Inventariar el bot, el `chat_id` autorizado, credencial de Telegram y los
-   flujos n8n publicados sin exponer secretos.
-2. Respaldar/exportar los flujos afectados y crear una versión de prueba.
-3. Añadir el aviso resumido tras la persistencia confirmada del formulario.
-4. Ampliar el receptor IMAP para alertar mensajes conocidos y nuevos, con
-   deduplicación durable y filtros de mensajes automáticos.
-5. Probar con datos ficticios: formulario válido, reintento, remitente nuevo,
-   contacto conocido, mensaje propio, rebote, automático, duplicado, fallo de
-   Telegram y chat no autorizado.
-6. Publicar primero los flujos de notificación, verificar entrega en el móvil y
-   documentar reversión.
-7. Diseñar y aprobar por separado el flujo de propuestas; después Facebook y
-   demos visuales.
+1. Auditar el estado actual del código, datos y todos los flujos/carpetas sin
+   mostrar secretos; respaldar antes de cualquier cambio.
+2. Reconciliar formularios, preferencias y respuestas por email con la matriz
+   anterior; implementar en cambios pequeños y añadir pruebas.
+3. Aplicar la plantilla común a los correos de cliente y administración.
+4. Confirmar que cada flujo esté bajo la carpeta del proyecto correcto y
+   distinguir sus nombres/nodos, sin mover flujos ajenos.
+5. Probar formulario válido/reintento/preferencia, correos nuevos/conocidos,
+   respuestas identificadas/no identificadas, spam, propio, rebote, automático,
+   duplicado y fallos de Telegram/correo.
+6. Publicar solo tras pruebas; verificar avisos en el móvil y documentar rollback.
+7. Eliminar únicamente flujos de prueba confirmados como creados por Codex,
+   previa confirmación de acción para cada objetivo; preservar los apagados
+   preexistentes y los del usuario.
+8. Respaldar e identificar con precisión cada registro ficticio antes de
+   limpiar la base; dejar intacto todo registro no concluyentemente de prueba.
+9. Diseñar por separado el flujo de propuestas; después Facebook y demos.
 
 ## Criterios de aceptación del primer hito
 
