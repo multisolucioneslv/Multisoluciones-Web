@@ -100,6 +100,37 @@ El formulario ya envía el idioma activo en el campo oculto `locale` (`en`, `es`
 
 Verificaciones realizadas con datos ficticios: envío inicial y aviso/acuse aceptados por Mailcow; cliente recurrente reconocido con preferencia previamente guardada; selección de WhatsApp guardada en PostgreSQL y confirmada por el formulario; correo interno aceptado por Mailcow; reintento del mismo token rechazado sin enviar un segundo aviso. El 2026-10-04 se probó el sitio público de extremo a extremo: el formulario en español recibió confirmación, el aviso interno registró el contacto recurrente y la solicitud #3 (anteriores: 2), y llegaron al buzón de `info@multisoluciones.online` el aviso y el acuse en español. Las rutas públicas `/`, `/es`, `/pt` y `/ko` devolvieron el idioma oculto correspondiente; la página localizada de preferencias respondió HTTP 200. `npm run lint` y `npm run build` pasaron en local; la compilación de producción también pasó en Linux.
 
-El formulario público ya está conectado al flujo publicado. La versión anterior se conserva en `/opt/multisoluciones-web-v2-pre-live-20261004` y en el respaldo `/opt/multisoluciones-web-v2-pre-contact-live-20261004.tar.gz` para una reversión controlada. No se modificaron Nginx, SSL, el sitio anterior ni Mailcow. Los nombres de nodos describen función y destinatario (por ejemplo, `Buscar Clientes existentes`, `Notificar a administración - Multisoluciones Web`, `Enviar acuse de recibo al cliente`, `Guardar preferencia y validar token`, `¿Se guardó la preferencia?` y `Notificar a administración - Preferencia de contacto`). El usuario confirmó la recepción del correo y la notificación de Telegram en pruebas de producción; el 2026-10-06 se limpió el contacto ficticio de prueba.
+El formulario público ya está conectado al flujo publicado. La versión anterior se conserva en `/opt/multisoluciones-web-v2-pre-live-20261004` y en el respaldo `/opt/multisoluciones-web-v2-pre-contact-live-20261004.tar.gz` para una reversión controlada. En ese despliegue inicial no se modificaron Nginx, SSL, el sitio anterior ni Mailcow. Los nombres de nodos describen función y destinatario (por ejemplo, `Buscar Clientes existentes`, `Notificar a administración - Multisoluciones Web`, `Enviar acuse de recibo al cliente`, `Guardar preferencia y validar token`, `¿Se guardó la preferencia?` y `Notificar a administración - Preferencia de contacto`). El usuario confirmó la recepción del correo y la notificación de Telegram en pruebas de producción; el 2026-10-06 se limpió el contacto ficticio de prueba.
+
+### Protección del endpoint público — implementación en curso (2026-10-06)
+
+- La Server Action enviará a ambos webhooks únicamente desde el servidor y con
+  `x-multisoluciones-webhook-secret`. Requiere `CONTACT_WEBHOOK_SECRET` con 64
+  caracteres hexadecimales; si falta o no cumple el formato, falla cerrado y no
+  llama a n8n. El secreto no pertenece al código ni al navegador.
+- Nginx limita por IP solo los `POST` de las páginas del formulario y de
+  `/contact-preference/[token]`, con promedio de 1 solicitud/minuto y hasta dos
+  solicitudes inmediatas de ráfaga. Las demás páginas, assets y rutas no cuentan
+  para ese límite. La zona está en
+  [`deploy/nginx/multisoluciones-contact-limit.conf`](../../deploy/nginx/multisoluciones-contact-limit.conf);
+  el virtual host de referencia está en
+  [`deploy/nginx/multisoluciones.online.conf`](../../deploy/nginx/multisoluciones.online.conf).
+- En n8n se requiere una credencial `Header Auth` con el nombre de encabezado
+  anterior, asignada a los dos nodos Webhook del flujo publicado de formulario/
+  preferencias. La configuración de la credencial y el ingreso de su valor deben
+  completarse manualmente en n8n; no se guardan en Git ni en este documento.
+- El sitio no se debe desplegar hasta que la credencial exista y el mismo valor
+  esté disponible como variable de entorno en el servicio de producción. Luego
+  se probarán: rechazo sin secreto, rechazo con valor incorrecto, aceptación
+  desde el sitio, límite de tasa, entrega de los correos con plantilla y aviso
+  Telegram. La configuración Nginx y el servicio se verifican antes de recargar
+  o reiniciar para mantener una reversión simple.
+- El 2026-10-06 se instaló la regla de tasa en el VPS, se validó con `nginx -t`
+  y se recargó Nginx tras respaldar el virtual host anterior en
+  `/etc/nginx/sites-available/multisoluciones.online.pre-contact-rate-20261006`.
+  Prueba local del proxy: los tres primeros `POST` pasaron y el cuarto devolvió
+  HTTP 429. El cambio de Next.js está solo en el repositorio local: falta crear
+  y asignar la credencial Header Auth en n8n y definir `CONTACT_WEBHOOK_SECRET`
+  en el entorno de producción antes de desplegarlo.
 
 Estado posterior — 2026-10-06: se publicó una plantilla HTML de ancho completo, con paleta menta y escape de valores para los avisos administrativos de nueva solicitud y preferencia. Un envío ficticio posterior al cambio devolvió éxito, registró el acuse al cliente y confirmó Telegram `sent`; falta revisar visualmente el aviso administrativo en la bandeja y probar el correo de aviso de preferencia con la nueva plantilla. El acuse del cliente ya incluía HTML y alternativa de texto. El receptor IMAP general está publicado, pero la respuesta automática de revisión a remitentes nuevos legítimos, la validación en vivo de los filtros/correlación y un límite durable de tasa para el endpoint público siguen pendientes; el proyecto aún no está terminado al 100%.

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --test automation/build-mail-workflows.test.mjs automation/contact-ack.test.mjs automation/contact-email.test.mjs automation/contact-webhook-auth.test.mjs automation/inbound-email.test.mjs automation/visual-content.test.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

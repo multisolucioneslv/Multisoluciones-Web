@@ -1,6 +1,7 @@
 'use server';
 
 import { randomUUID } from 'node:crypto';
+import { buildWebhookAuthHeaders } from '../../../automation/contact-webhook-auth.mjs';
 
 export type ContactState = {
   status: 'idle' | 'success' | 'mockSuccess' | 'failure' | 'notConfigured' | 'invalid';
@@ -64,12 +65,14 @@ export async function submitContact(
 
   if (contactMode === 'n8n-test' || contactMode === 'n8n-live') {
     const endpoint = resolveContactWebhook(process.env.CONTACT_WEBHOOK_URL);
+    const headers = buildWebhookAuthHeaders(process.env.CONTACT_WEBHOOK_SECRET);
     if (!endpoint) return { status: 'failure' };
+    if (!headers) return { status: 'notConfigured' };
 
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers,
         body: JSON.stringify({
           name: name.trim(),
           email: email.trim(),
@@ -149,11 +152,13 @@ export async function submitContactPreference(
 
   const endpoint = resolveContactWebhook(process.env.CONTACT_PREFERENCE_WEBHOOK_URL);
   if (!endpoint) return { status: 'failure' };
+  const headers = buildWebhookAuthHeaders(process.env.CONTACT_WEBHOOK_SECRET);
+  if (!headers) return { status: 'notConfigured' };
 
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers,
       body: JSON.stringify({
         token,
         channel,
