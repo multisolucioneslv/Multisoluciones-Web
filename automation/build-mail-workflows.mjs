@@ -60,6 +60,7 @@ const workerNodes=[
 for (const n of workerNodes.filter(n=>n.type.endsWith('.emailSend') || n.type.endsWith('.telegram'))) n.onError='continueRegularOutput';
 const workerConnections={};
 workerNodes.slice(1,4).forEach((n,i)=>connect(workerConnections,workerNodes[i].name,n.name));
+connect(workerConnections,'Preparar avisos de correo y Telegram','¿El aviso es Telegram?');
 connect(workerConnections,'¿El aviso es Telegram?','Notificar por Telegram - Multisoluciones Web',0);connect(workerConnections,'¿El aviso es Telegram?','¿El aviso es para administración?',1);
 connect(workerConnections,'¿El aviso es para administración?',adminName,0);connect(workerConnections,'¿El aviso es para administración?',replyName,1);
 connect(workerConnections,adminName,'Registrar aviso enviado a administración');connect(workerConnections,replyName,'Registrar confirmación enviada y su identificador SMTP');
