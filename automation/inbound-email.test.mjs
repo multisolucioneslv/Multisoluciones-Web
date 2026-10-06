@@ -76,6 +76,12 @@ test('n8n Simple IMAP attribute headers preserve sender, Message-ID and date', (
   assert.equal(normalized.receivedAt,'2026-10-05T12:00:00.000Z');
   assert.equal(classifyIncomingEmail({email:actual}).reason,'unknown_contact');
 });
+test('valid known and new senders both pass intake filtering; automated mail does not', () => {
+  const known = email('A valid message', {date:'2026-10-05T12:00:00Z'});
+  const unknown = email('A valid message', {from:'new@example.org',date:'2026-10-05T12:00:00Z'});
+  for (const message of [known, unknown]) assert.notEqual(classifyIncomingEmail({email:message,contact:message===known?contact:null}).action,'ignore');
+  assert.equal(classifyIncomingEmail({email:email('automatic',{date:'2026-10-05T12:00:00Z',headers:{'auto-submitted':'auto-replied'}})}).action,'ignore');
+});
 test('missing phone, conflicting choices and incomplete intent clarify', () => {
   for (const text of ['Llámame al 612345678', 'Prefiero WhatsApp', 'Prefiero correo y quiero una llamada', 'Please contact me', 'No quiero WhatsApp', 'Call me +14155550123 or +14155550999']) {
     const result = classify(text); assert.equal(result.action, 'clarify', text); assert.equal(result.preference, null); assert.ok(buildIncomingReply(result));
