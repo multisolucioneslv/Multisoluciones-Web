@@ -64,8 +64,10 @@ connect(workerConnections,'¿El aviso es para administración?',adminName,0);con
 connect(workerConnections,adminName,workerNodes[9].name);connect(workerConnections,replyName,workerNodes[10].name);
 connect(workerConnections,'Notificar por Telegram - Multisoluciones Web',workerNodes[8].name);
 const worker={id:'MWAvisosCorreo20261004',name:'Multisoluciones Web - Entregar avisos de correo',active:false,nodes:workerNodes,connections:workerConnections,settings:{executionOrder:'v1',executionTimeout:120},pinData:{},staticData:null};
-writeFileSync(`${outputDirectory}/receiver.json`,JSON.stringify([receiver],null,2));
-writeFileSync(`${outputDirectory}/worker.json`,JSON.stringify([worker],null,2));
+delete receiver.id;
+delete worker.id;
+writeFileSync(`${outputDirectory}/receiver.json`,JSON.stringify(receiver,null,2));
+writeFileSync(`${outputDirectory}/worker.json`,JSON.stringify(worker,null,2));
 // Preserve the existing flow and its published brand template, adding SMTP
 // history so incoming replies can be related to the right request.
 const registrationName='Registrar acuse enviado al cliente y su identificador SMTP';
@@ -85,6 +87,10 @@ if (!webQuery.parameters.query.includes('telegram_notification AS')) {
 }
 // Import as a draft; publish only after validating the new DB schema.
 current.name='Multisoluciones Web - Formulario y preferencias de contacto';
-current.active=false; delete current.activeVersionId; delete current.shared;
-writeFileSync(`${outputDirectory}/contact-with-history.json`,JSON.stringify([current],null,2));
+current.active=false;
+delete current.id;
+delete current.versionId;
+delete current.activeVersionId;
+delete current.shared;
+writeFileSync(`${outputDirectory}/contact-with-history.json`,JSON.stringify(current,null,2));
 console.log('Generated inactive receiver and notification worker; publication requires tested DB and credentials.');
