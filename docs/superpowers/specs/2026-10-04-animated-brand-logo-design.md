@@ -22,4 +22,5 @@ se sustituye su uso en la cabecera por un SVG nativo del símbolo `{MW}`.
 Los colores proceden de los tokens existentes de cada tema y una luz recorre
 los trazos durante tres segundos en bucle. Con movimiento reducido, se oculta
 la luz y permanece el símbolo fijo. No se reproduce ni descarga el vídeo.
-Los vídeos originales y sus copias se conservan como referencia.
+Por solicitud del usuario, los archivos MP4 de referencia se eliminaron el
+2026-10-06; el SVG es el recurso vigente.
