@@ -129,12 +129,12 @@ export async function submitContactPreference(
   if (
     typeof token !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(token) ||
     typeof channel !== 'string' || !['email', 'call', 'whatsapp', 'none'].includes(channel) ||
-    (typeof phone !== 'string')
+    (phone !== null && typeof phone !== 'string')
   ) {
     return { status: 'invalid' };
   }
 
-  const normalizedPhone = phone.trim().replace(/[\s().-]/g, '');
+  const normalizedPhone = typeof phone === 'string' ? phone.trim().replace(/[\s().-]/g, '') : '';
   if ((channel === 'call' || channel === 'whatsapp') && !/^\+?[0-9]{7,15}$/.test(normalizedPhone)) {
     return { status: 'invalid' };
   }
