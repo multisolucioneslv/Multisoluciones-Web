@@ -102,3 +102,37 @@ Run `node automation/build-mail-workflows.mjs AUDIT_DIRECTORY OUTPUT_DIRECTORY`.
 Preserve `MW_EMAIL_START_AT` when regenerating the receiver so its initial
 mail cutoff does not silently move forward. Do not commit credentials, mailbox
 exports, customer data or private audit files.
+
+## Estado operativo actual — 2026-10-06
+
+La sección del 2026-10-04 es el registro histórico de aquella publicación; sus
+IDs y estado de Telegram no describen la instalación actual. En la carpeta
+MultisolucionesWeb se conservaron seis flujos: `mrOly0udSli3SYQV` (formulario y
+preferencias), `uWwgwhO4cuprATDl` (receptor/notificación de formulario),
+`WodmxwY1V5B4EoFn` (entrega de avisos por correo y Telegram), además de los tres
+flujos del usuario `QPZhVLldIeR7ADWB`, `WZz8uo8R8iQjrzJI` y
+`GIocLWM9jy4nl4GU`. Se eliminaron, previa confirmación, los seis borradores de
+prueba/respaldo creados durante la implementación: `GMxnWRZMpKVnDCZG`,
+`t9lgvMCLcaT4FKNC`, `8R9pW9tNCHkvdNtJ`, `u9dn9VgNC65vBUH5`,
+`MWCorreoDirecto20261004` y `MWAvisosCorreo20261004`.
+
+Pruebas recientes: se verificó la entrega del aviso de formulario a Telegram;
+el aviso y acuse de correo llegaron al buzón durante la prueba de producción;
+la preferencia `none` se guardó correctamente y se limpió después el contacto
+ficticio y sus registros relacionados. Antes de esa limpieza se creó el dump
+protegido `/opt/multisoluciones-web-backups/20261006-after-test-before-cleanup.dump`.
+Los contadores de contactos, solicitudes, mensajes, notificaciones y eventos de
+preferencia quedaron en cero tras limpiar los datos ficticios.
+
+El 2026-10-06 se publicó en el flujo `mrOly0udSli3SYQV` una plantilla HTML de
+ancho 100%, colores menta y escape de contenido para los dos avisos internos
+(nueva solicitud y preferencia guardada). El aviso de nueva solicitud conserva
+también el formato de texto alternativo; el acuse al cliente ya tenía HTML y
+texto. No se ejecutó una nueva prueba de envío tras esta última edición; debe
+validarse con el siguiente envío ficticio controlado antes de considerar la
+plantilla visual comprobada en la bandeja.
+
+El flujo de correo entrante general y el filtrado de remitentes nuevos siguen
+siendo una fase pendiente: la notificación de formulario y la entrega de la
+cola de avisos están activas, pero no debe afirmarse que toda la bandeja IMAP
+queda monitorizada hasta publicar y probar el receptor general y sus reglas.
