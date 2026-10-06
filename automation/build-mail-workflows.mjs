@@ -45,7 +45,8 @@ const adminName='Enviar aviso de correo a administración';
 const replyName='Enviar confirmación al cliente por correo';
 const workerNodes=[
   node('Revisar avisos pendientes cada minuto','scheduleTrigger',{rule:{interval:[{field:'minutes',minutesInterval:1}]}},[0,0],null,1.2),
-  db('Reservar avisos pendientes sin duplicarlos',`WITH jobs AS (SELECT id FROM public.email_notifications WHERE state='pending' AND kind IN ('admin','reply','telegram') ORDER BY id FOR UPDATE SKIP LOCKED LIMIT 20), claimed AS (UPDATE public.email_notifications n SET state='processing',claim_token=$1,claimed_at=now() FROM jobs WHERE n.id=jobs.id RETURNING n.*) SELECT * FROM claimed;`,"={{ [String($execution.id)] }}",[240,0]),
+  db('Reservar avisos pendientes sin duplicarlos',`WITH jobs AS (SELECT id FROM public.email_notifications WHERE state='pending' AND kind IN ('admin','reply','telegram') ORDER BY id FOR UPDATE SKIP LOCKED LIMIT 20) UPDATE public.email_notifications n SET state='processing',claim_token=$1,claimed_at=now() FROM jobs WHERE n.id=jobs.id;`,"={{ [String($execution.id)] }}",[240,0]),
+  db('Leer avisos reservados por esta ejecución',`SELECT id,kind,contact_id,request_id,message_id,payload,claim_token FROM public.email_notifications WHERE state='processing' AND claim_token=$1::text ORDER BY id;`,"={{ [String($execution.id)] }}",[360,0]),
   code('Preparar avisos de correo y Telegram',source+'\n'+renderer+`\nreturn $input.all().map((item,index)=> { const job=item.json; const result=job.payload; const contact=result.contact || {}; if (job.kind==='telegram') { const text=buildTelegramNotification(result,contact); if (!text) throw new Error('Telegram notification without safe summary'); return {json:{...job,text},pairedItem:{item:index}}; } const content=job.kind==='admin'?buildAdminNotification(result,contact):buildIncomingReply(result,contact); if (!content) throw new Error('Notification without content'); return {json:{...job,to:job.kind==='admin'?'info@multisoluciones.online':content.to,subject:content.subject,text:content.text,html:renderContactEmail({...content,language:job.kind==='admin'?'es':result.language})},pairedItem:{item:index}}; });`,[480,0]),
   node('¿El aviso es Telegram?','if',{conditions:{options:{caseSensitive:true,leftValue:'',typeValidation:'strict',version:2},conditions:[{id:randomUUID(),leftValue:'={{ $json.kind }}',rightValue:'telegram',operator:{type:'string',operation:'equals'}}],combinator:'and'},options:{}},[720,0],null,2.2),
   node('Notificar por Telegram - Multisoluciones Web','telegram',{resource:'message',operation:'sendMessage',chatId:telegramChatId,text:'={{ $json.text }}',additionalFields:{}},[960,-220],{telegramApi:telegram},1),
@@ -59,10 +60,10 @@ const workerNodes=[
 for (const n of workerNodes.filter(n=>n.type.endsWith('.emailSend') || n.type.endsWith('.telegram'))) n.onError='continueRegularOutput';
 const workerConnections={};
 workerNodes.slice(1,4).forEach((n,i)=>connect(workerConnections,workerNodes[i].name,n.name));
-connect(workerConnections,workerNodes[3].name,'Notificar por Telegram - Multisoluciones Web',0);connect(workerConnections,workerNodes[3].name,'¿El aviso es para administración?',1);
+connect(workerConnections,'¿El aviso es Telegram?','Notificar por Telegram - Multisoluciones Web',0);connect(workerConnections,'¿El aviso es Telegram?','¿El aviso es para administración?',1);
 connect(workerConnections,'¿El aviso es para administración?',adminName,0);connect(workerConnections,'¿El aviso es para administración?',replyName,1);
-connect(workerConnections,adminName,workerNodes[9].name);connect(workerConnections,replyName,workerNodes[10].name);
-connect(workerConnections,'Notificar por Telegram - Multisoluciones Web',workerNodes[8].name);
+connect(workerConnections,adminName,'Registrar aviso enviado a administración');connect(workerConnections,replyName,'Registrar confirmación enviada y su identificador SMTP');
+connect(workerConnections,'Notificar por Telegram - Multisoluciones Web','Registrar aviso Telegram entregado');
 const worker={id:'MWAvisosCorreo20261004',name:'Multisoluciones Web - Entregar avisos de correo',active:false,nodes:workerNodes,connections:workerConnections,settings:{executionOrder:'v1',executionTimeout:120},pinData:{},staticData:null};
 delete receiver.id;
 delete worker.id;
